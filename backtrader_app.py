@@ -8,8 +8,13 @@ from utils.logs import logger
 from utils.processing import gen_stock_df, run_backtrader
 from utils.schemas import StrategyBase
 
+import asyncio
+import nest_asyncio
+nest_asyncio.apply()
+asyncio.set_event_loop(asyncio.new_event_loop())
 st.set_page_config(page_title="backtrader", page_icon=":chart_with_upwards_trend:", layout="wide")
-
+# 禁用有问题的缓存机制
+st.session_state.disable_static_file_hash = True  # ← 关键修复
 
 def main():
     ak_params = akshare_selector_ui()
