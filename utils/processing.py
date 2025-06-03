@@ -52,13 +52,16 @@ def run_backtrader(stock_df: pd.DataFrame, strategy: StrategyBase, bt_params: Ba
     # 初始化回测引擎
     cerebro = bt.Cerebro()
     cerebro.adddata(data)
-    cerebro.broker.setcash(bt_params.start_cash)
-    cerebro.broker.setcommission(commission=bt_params.commission_fee)
-    cerebro.addsizer(bt.sizers.FixedSize, stake=bt_params.stake)
+    cerebro.broker.setcash(bt_params.start_cash)# 设置初始资金
+    cerebro.broker.setcommission(commission=bt_params.commission_fee) # 手续费 setcommission：支持按百分比或固定值设置手续费
+    cerebro.addsizer(bt.sizers.FixedSize, stake=bt_params.stake)# 固定交易数量  addsizer：控制每次交易的头寸规模
 
     # 添加分析器
+    #计算夏普比率（无风险利率设为0）
     cerebro.addanalyzer(btanalyzers.SharpeRatio, _name="sharpe", riskfreerate=0.0)
+    #分析最大回撤
     cerebro.addanalyzer(btanalyzers.DrawDown, _name="drawdown")
+    #计算年化收益率
     cerebro.addanalyzer(btanalyzers.Returns, _name="returns")
 
     # 动态导入策略类
@@ -74,7 +77,7 @@ def run_backtrader(stock_df: pd.DataFrame, strategy: StrategyBase, bt_params: Ba
 
     # 处理回测结果
     par_list = []
-    for x in back:
+    for x in back:# 遍历所有参数组合的回测结果
         # 收集策略参数
         par = []
         for param in strategy.params.keys():
@@ -83,9 +86,9 @@ def run_backtrader(stock_df: pd.DataFrame, strategy: StrategyBase, bt_params: Ba
         # 添加性能指标
         par.extend(
             [
-                x[0].analyzers.returns.get_analysis()["rnorm100"],
-                x[0].analyzers.drawdown.get_analysis()["max"]["drawdown"],
-                x[0].analyzers.sharpe.get_analysis()["sharperatio"],
+                x[0].analyzers.returns.get_analysis()["rnorm100"], # 收益率（百分比）
+                x[0].analyzers.drawdown.get_analysis()["max"]["drawdown"],# 最大回撤
+                x[0].analyzers.sharpe.get_analysis()["sharperatio"],# 夏普比率
             ]
         )
         par_list.append(par)
