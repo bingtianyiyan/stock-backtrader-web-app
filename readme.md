@@ -15,12 +15,13 @@
 
 ## 技术架构
 
-| 组件 | 功能 | 链接 |
-|------|------|------|
-| **Streamlit** | 构建交互式数据应用界面 | [官方仓库](https://github.com/streamlit/streamlit) |
-| **AkShare** | 获取金融市场数据 | [官方仓库](https://github.com/akfamily/akshare) |
-| **Backtrader** | 执行量化交易策略回测 | [官方仓库](https://github.com/mementum/backtrader) |
-| **Pyecharts** | 生成专业金融数据图表 | [官方仓库](https://github.com/pyecharts/pyecharts) |
+| 组件             | 功能          | 链接 |
+|----------------|-------------|------|
+| **Streamlit**  | 构建交互式数据应用界面 | [官方仓库](https://github.com/streamlit/streamlit) |
+| **AkShare**    | 获取金融市场数据    | [官方仓库](https://github.com/akfamily/akshare) |
+| **Backtrader** | 执行量化交易策略回测  | [官方仓库](https://github.com/mementum/backtrader) |
+| **Pyecharts**  | 生成专业金融数据图表  | [官方仓库](https://github.com/pyecharts/pyecharts) |
+| **logus**      | 日志组件        | [官方仓库]() |
 
 ## 快速开始
 

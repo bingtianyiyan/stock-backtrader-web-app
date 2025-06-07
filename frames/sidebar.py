@@ -1,47 +1,68 @@
 import datetime
-
 import streamlit as st
+from streamlit_option_menu import option_menu
 
-from utils.schemas import AkshareParams, BacktraderParams
-
-
-def akshare_selector_ui() -> AkshareParams:
-    """akshare params
-
-    :return: AkshareParams
-    """
-    st.sidebar.markdown("# Akshare Config")
-    symbol = st.sidebar.text_input("symbol")
-    period = st.sidebar.selectbox("period", ("daily", "weekly", "monthly"))
-    start_date = st.sidebar.date_input("start date", datetime.date(1970, 1, 1))
-    start_date = start_date.strftime("%Y%m%d")
-    end_date = st.sidebar.date_input("end date", datetime.datetime.today())
-    end_date = end_date.strftime("%Y%m%d")
-    adjust = st.sidebar.selectbox("adjust", ("qfq", "hfq", ""))
-    return AkshareParams(
-        symbol=symbol,
-        period=period,
-        start_date=start_date,
-        end_date=end_date,
-        adjust=adjust,
+#streamlit 整体页面数据
+def page_config():
+    # 页面配置
+    st.set_page_config(
+        page_title="金融数据看板",
+        page_icon="📊",
+        layout="wide",
+        initial_sidebar_state="expanded"
     )
+    # 自定义CSS样式
+    st.markdown("""
+    <style>
+        /* 主标题样式 */
+        .header-style {
+            text-align: center;
+            color: #2e86c1;
+            margin-bottom: 10px;
+        }
+    
+        /* 侧边栏导航样式 */
+        .nav-item {
+            display: block;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            text-decoration: none !important;
+        }
+        .nav-item:hover {
+            background-color: #f0f2f6;
+        }
+        .nav-item.active {
+            background-color: #2e86c1;
+            color: white !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    #sst.markdown('<h1 class="header-style">📊 金融数据综合分析看板</h1>', unsafe_allow_html=True)
 
+    # 初始化session_state  固定先首页
+    if 'current_page' not in st.session_state:
+        st.session_state.current_page = "首页"
 
-def backtrader_selector_ui() -> BacktraderParams:
-    """backtrader params
-
-    :return: BacktraderParams
-    """
-    st.sidebar.markdown("# BackTrader Config")
-    start_date = st.sidebar.date_input("backtrader start date", datetime.date(2000, 1, 1))
-    end_date = st.sidebar.date_input("backtrader end date", datetime.datetime.today())
-    start_cash = st.sidebar.number_input("start cash", min_value=0, value=100000, step=10000)
-    commission_fee = st.sidebar.number_input("commission fee", min_value=0.0, max_value=1.0, value=0.001, step=0.0001)
-    stake = st.sidebar.number_input("stake", min_value=0, value=100, step=10)
-    return BacktraderParams(
-        start_date=start_date,
-        end_date=end_date,
-        start_cash=start_cash,
-        commission_fee=commission_fee,
-        stake=stake,
-    )
+# 菜单 侧边栏导航 - 兼容旧版Streamlit的实现
+def sidebar_navigation(menu_title, options,menu_icon=None):
+    with st.sidebar:
+        selected = option_menu(
+            menu_title,
+            options,
+            icons=menu_icon,
+            menu_icon="cast",
+            default_index=0,
+        )
+    st.markdown("""
+     <style>
+         [data-testid="stSidebar"] {
+             width: 10px !important;
+         }
+         .st-option-menu {
+             background-color: #f0f2f6;
+         }
+     </style>
+     """, unsafe_allow_html=True)
+    return selected

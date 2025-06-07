@@ -4,6 +4,7 @@ import asyncio
 import nest_asyncio
 from streamlit.web.cli import main as st_main
 
+#调试streamlit 启动这个
 
 def is_streamlit_running():
     """检查是否已有Streamlit进程运行"""
@@ -31,7 +32,7 @@ def run_as_subprocess():
         subprocess.run([
             sys.executable,
             "-m", "streamlit",
-            "run", "backtrader_app.py",  # 改为你的主入口文件
+            "run", "main.py",  # 改为你的主入口文件
             "--server.port=8502",
             "--server.headless=true"
         ], check=True)
@@ -45,7 +46,7 @@ def main():
 
     if not is_streamlit_running():
         # 方案1：直接调用（适合调试）
-        sys.argv = ["streamlit", "run", "backtrader_app.py","--server.port=8502"]  # 明确指定主文件
+        sys.argv = ["streamlit", "run", "main.py","--server.port=8502"]  # 明确指定主文件
         sys.exit(st_main())
 
         # 或者方案2：使用子进程（更稳定）
