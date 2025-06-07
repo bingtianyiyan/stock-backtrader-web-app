@@ -32,3 +32,32 @@ def get_etf_data():
     except Exception as e:
         st.error(f"ETF数据获取失败: {str(e)}")
         return pd.DataFrame()
+
+#获取多个指数的历史数据并合并
+def get_zh_history(symbol_dict, start_date, end_date):
+    """
+    获取多个指数的历史数据并合并
+    """
+    index_his = None
+    for name, code in symbol_dict.items():
+        try:
+            index_his_tmp = ak.index_zh_a_hist(
+                symbol=code,
+                period="daily",
+                start_date=start_date,
+                end_date=end_date
+            )
+            index_his_tmp = index_his_tmp[['日期', '开盘', '收盘']]
+            index_his_tmp.columns = ['日期', f'开盘_{name}', f'收盘_{name}']
+
+            if index_his is None:
+                index_his = index_his_tmp
+            else:
+                index_his = index_his.merge(index_his_tmp, on=['日期'], how='left')
+        except Exception as e:
+            st.error(f"获取{name}({code})数据失败: {str(e)}")
+            continue
+
+    if index_his is not None:
+        index_his = index_his.sort_values(['日期'])
+    return index_his

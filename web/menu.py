@@ -3,6 +3,7 @@ import streamlit as st
 from frames.sidebar import sidebar_navigation
 from web.backtraderpage import stockAnalysis
 from web.etfpage import show_etf_page
+from web.stockpage import show_stock_page
 
 
 #设置菜单
@@ -34,7 +35,7 @@ def etf_page():
 
 def stock_page():
     st.title("📈 Stock数据")
-    st.write("这里是设置页面...")
+    show_stock_page()
 
 def back_trader_page():
     st.title("📈 回测数据")

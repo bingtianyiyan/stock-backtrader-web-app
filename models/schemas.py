@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Dict
+from attr import dataclass
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
@@ -26,6 +27,14 @@ class BacktraderParams(BaseModel):
 
 class StrategyBase(BaseModel):
     """策略基础模型"""
-
     name: str
     params: Dict[str, Any]
+
+@dataclass
+class Stock:
+    code: str
+    name: str
+    market: str
+    sector: Optional[str] = None
+    listing_date: Optional[str] = None
+    pe_ratio: Optional[float] = None
