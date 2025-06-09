@@ -63,18 +63,6 @@ def show_rsi_page():
                     overbought=overbought,
                     oversold=oversold
                 )
-
-                # 保存结果
-                # try:
-                #     with pd.ExcelWriter("data/RSI_Strategy_Results.xlsx",
-                #                         engine='openpyxl',
-                #                         mode='a',
-                #                         if_sheet_exists='replace') as writer:
-                #         result_df.to_excel(writer, sheet_name=f"{stock_info.name}_{stock_code}", index=False)
-                # except FileNotFoundError:
-                #     with pd.ExcelWriter("data/RSI_Strategy_Results.xlsx", engine='openpyxl', mode='w') as writer:
-                #         result_df.to_excel(writer, sheet_name=f"{stock_info.name}_{stock_code}", index=False)
-
                 # 显示结果
                 st.session_state.result_df = result_df
                 st.session_state.stock_info = stock_info
