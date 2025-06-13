@@ -81,4 +81,3 @@ def stock_page(selected_secondary,menu_options,submenus):
 def back_trader_page():
     st.title("📈 回测数据")
     stockAnalysis()
-    
