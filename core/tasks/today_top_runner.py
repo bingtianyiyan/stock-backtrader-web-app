@@ -9,7 +9,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from core.api.selector import get_top_up_today, get_top_vol, get_top_down_today
 from core.domain import Stock
 from core.informer.inform_utils import add_to_eastmoney
-from core.inialize.pre_init import init_log
 from core.recorders.em.em_api import record_hot_topic
 from core.tag.common import InsertMode
 from core.tag.tag_schemas import StockPools

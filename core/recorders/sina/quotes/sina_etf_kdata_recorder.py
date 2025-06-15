@@ -8,7 +8,6 @@ from core.api.kdata import generate_kdata_id, get_kdata
 from core.contract import IntervalLevel
 from core.contract.recorder import FixedCycleDataRecorder
 from core.domain import Etf, Etf1dKdata
-from core.inialize.pre_init import init_log
 from core.recorders.consts import EASTMONEY_ETF_NET_VALUE_HEADER
 from core.utils.time_utils import to_time_str
 

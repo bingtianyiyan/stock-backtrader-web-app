@@ -3,20 +3,22 @@ import importlib
 import logging
 import os
 import pkgutil
-import pprint
 import shutil
 from typing import List
 
 import pandas as pd
 import pkg_resources
-from omegaconf import OmegaConf
 
-from consts import ZVT_TEST_HOME, ZVT_HOME
-from core.config.configmanager import configmanager
 
 __version__ = "1.0.0"  # 手动维护版本
 
+from omegaconf import OmegaConf
+
+from core.config.configmanager import configmanager
+from core.inialize.config import init_config
+
 from core.inialize.logger import init_log
+from core.inialize.resources import init_resources
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +30,7 @@ pd.set_option("display.max_columns", None)
 
 _plugins = {}
 
-def init_env(zvt_home: str, **kwargs) -> dict:
+def init_env():
     """
     init env
 
@@ -40,65 +42,14 @@ def init_env(zvt_home: str, **kwargs) -> dict:
     # init log
     init_log()
 
-    resource_path = os.path.join(zvt_home, "resources")
-    tmp_path = os.path.join(zvt_home, "tmp")
-    if not os.path.exists(resource_path):
-        os.makedirs(resource_path)
+    init_resources()
 
-    if not os.path.exists(tmp_path):
-        os.makedirs(tmp_path)
-    zvt_env = {}
-    zvt_env["zvt_home"] = zvt_home
-    zvt_env["resource_path"] = resource_path
-    zvt_env["tmp_path"] = tmp_path
-    conf_obj = OmegaConf.create(zvt_env)
-    configmanager.update_env(OmegaConf.to_object(conf_obj))
-
-    pprint.pprint(zvt_env)
-
-    init_resources(resource_path=resource_path)
     # init plugin
     # init_plugins()
     #registerMeta()
 
     logger.info("init config done")
-    return zvt_env
 
-
-def init_resources(resource_path):
-    package_name = "core"
-    package_dir = pkg_resources.resource_filename(package_name, "resources")
-    from core.utils.file_utils import list_all_files
-
-    files: List[str] = list_all_files(package_dir, ext=None)
-    for source_file in files:
-        dst_file = os.path.join(resource_path, source_file[len(package_dir) + 1 :])
-        if not os.path.exists(dst_file):
-            shutil.copyfile(source_file, dst_file)
-
-
-def init_config() -> dict:
-    """
-    init config
-    """
-
-    #根据环境变量读取
-    env = ""
-    # 2. 加载基础配置 + 环境特定配置
-    parentRoot = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    config_path = os.path.join(parentRoot, "config/config.yaml")
-    base_config = OmegaConf.load(config_path)
-    env = base_config.get("current_env")
-    if not env:
-        env = os.getenv("APP_ENV", "dev")
-    config_path = os.path.join(parentRoot, f"config/{env}_config.yaml")
-    env_config = OmegaConf.load(config_path)
-    # 3. 合并配置（环境配置覆盖基础配置）
-    current_config = OmegaConf.merge(base_config, env_config)
-    # 解析所有插值并转为普通字典（如果需要）
-    #resolved_config = OmegaConf.to_container(current_config, resolve=True)
-    configmanager.update(OmegaConf.to_object(current_config))
-    return OmegaConf.to_object(current_config)
 
 
 def init_plugins():
@@ -125,10 +76,6 @@ def registerMeta():
         logger.warning("QMT need run in Windows!")
 
 #先初始化config信息
-if os.getenv("TESTING_ZVT"):
-    init_env(zvt_home=ZVT_TEST_HOME)
-
-else:
-    init_env(zvt_home=ZVT_HOME)
+init_env()
 
 

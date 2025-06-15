@@ -10,7 +10,6 @@ from core.contract import IntervalLevel
 from core.contract.api import df_to_db
 from core.contract.recorder import FixedCycleDataRecorder
 from core.domain import Index, IndexKdataCommon
-from core.inialize.pre_init import init_log
 from core.recorders.joinquant.common import to_jq_trading_level, to_jq_entity_id
 from core.utils.pd_utils import pd_is_not_null
 from core.utils.time_utils import to_time_str, TIME_FORMAT_DAY, TIME_FORMAT_ISO8601

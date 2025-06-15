@@ -20,7 +20,6 @@ from core.domain import (
 from core.factors import compute_top_stocks
 from core.informer import EmailInformer
 from core.informer.inform_utils import inform_email
-from core.inialize.pre_init import init_log
 from core.tag.tag_stats import build_system_stock_pools, build_stock_pool_tag_stats
 from core.utils.recorder_utils import run_data_recorder
 from core.utils.time_utils import current_date
