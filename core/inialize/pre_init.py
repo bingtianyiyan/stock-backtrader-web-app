@@ -17,53 +17,15 @@ from core.config.configmanager import configmanager
 
 __version__ = "1.0.0"  # 手动维护版本
 
+from core.inialize.logger import init_log
+
 logger = logging.getLogger(__name__)
-
-# 初始化日志
-def init_log(file_name="tiny.log", log_dir=None, simple_formatter=True):
-    if not log_dir:
-        log_dir = configmanager.get_env()["log_path"]
-
-    root_logger = logging.getLogger()
-
-    # reset the handlers
-    root_logger.handlers = []
-
-    root_logger.setLevel(logging.INFO)
-
-    file_name = os.path.join(log_dir, file_name)
-
-    file_log_handler = RotatingFileHandler(file_name, maxBytes=524288000, backupCount=10)
-
-    file_log_handler.setLevel(logging.INFO)
-
-    console_log_handler = logging.StreamHandler()
-    console_log_handler.setLevel(logging.INFO)
-
-    # create formatter and add it to the handlers
-    if simple_formatter:
-        formatter = logging.Formatter("%(asctime)s  %(levelname)s  %(threadName)s  %(message)s")
-    else:
-        formatter = logging.Formatter(
-            "%(asctime)s  %(levelname)s  %(threadName)s  %(name)s:%(filename)s:%(lineno)s  %(funcName)s  %(message)s"
-        )
-    file_log_handler.setFormatter(formatter)
-    console_log_handler.setFormatter(formatter)
-
-    # add the handlers to the logger
-    root_logger.addHandler(file_log_handler)
-    root_logger.addHandler(console_log_handler)
-
 
 os.environ.setdefault("SQLALCHEMY_WARN_20", "1")
 pd.set_option("expand_frame_repr", False)
 pd.set_option("mode.chained_assignment", "raise")
 pd.set_option("display.max_rows", None)
 pd.set_option("display.max_columns", None)
-
-# # load default config
-# # 使用 pkg_resources 获取 YAML 文件路径，并用 OmegaConf 加载
-# zvt_config = OmegaConf.load("config/config.yaml")
 
 _plugins = {}
 
@@ -92,7 +54,7 @@ def init_env(zvt_home: str, **kwargs) -> dict:
     conf_obj = OmegaConf.create(zvt_env)
     configmanager.update_env(OmegaConf.to_object(conf_obj))
 
-    init_log()
+    logger = init_log()
 
     pprint.pprint(zvt_env)
 
@@ -102,6 +64,8 @@ def init_env(zvt_home: str, **kwargs) -> dict:
     # init plugin
     # init_plugins()
     registerMeta()
+
+    logger.info("init config done")
     return zvt_env
 
 

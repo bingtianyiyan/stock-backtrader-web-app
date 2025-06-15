@@ -2,7 +2,9 @@ from typing import Any, Dict
 
 import yaml
 
-from .logs import logger
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def load_strategy(yaml_file: str) -> Dict[str, Any]:
@@ -19,5 +21,5 @@ def load_strategy(yaml_file: str) -> Dict[str, Any]:
             strategy = yaml.safe_load(f)
         return strategy
     except (FileNotFoundError, yaml.YAMLError) as e:
-        logger.error(f"加载策略配置失败: {e}")
+        log.error(f"加载策略配置失败: {e}")
         raise
