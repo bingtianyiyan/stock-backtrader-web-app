@@ -1,21 +1,17 @@
-import json
 
 from loguru import logger
-
 from ..base import BaseLogger
-from ..config import LoggerConfig, FileWriterArgs, ConsoleWriterArgs
+from ..config import FileWriterArgs, ConsoleWriterArgs, LoggerConfig
 import sys
 from pathlib import Path
-from typing import Dict, Any, Optional, TypeVar, Callable
+from typing import  Any, Optional, TypeVar, Callable
 from functools import wraps
-
-from ..options import Options
 
 T = TypeVar('T')
 
 
 class LoguruAdapter(BaseLogger):
-    def __init__(self, config: Options):
+    def __init__(self, config: LoggerConfig):
         """
                初始化适配器
 
@@ -26,7 +22,7 @@ class LoguruAdapter(BaseLogger):
         if config is not None:
             self._setup_handlers(config)
 
-    def _setup_handlers(self, config: Options):
+    def _setup_handlers(self, config: LoggerConfig):
         """配置日志处理器"""
         logger.remove()  # 清除现有处理器
         """配置所有日志处理器"""
@@ -61,13 +57,16 @@ class LoguruAdapter(BaseLogger):
     def _add_file_handler(self, args: FileWriterArgs, default_level: str):
         """文件日志（支持轮转/压缩）"""
         Path(args.path).parent.mkdir(parents=True, exist_ok=True)
-
+        #logger.remove()  # 清理旧配置
         logger.add(
             args.path,
             level=default_level,
-            rotation=getattr(args, 'max_size', '500 MB'),  # 使用getattr提供默认值
+            rotation=getattr(args, 'rotation', '500 MB'),  # 使用getattr提供默认值
             retention=getattr(args, 'retention', '7 days'),
             compression=getattr(args, 'compression',None),
+            mode="a",
+            filter= lambda _: True,  # 禁用内部重命名逻辑
+            enqueue=getattr(args, 'enqueue', True),
             format=getattr(args,'format',
                               "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
                               "<level>{level: <8}</level> | "
@@ -92,13 +91,12 @@ class LoguruAdapter(BaseLogger):
         new_adapter._logger = logger.bind(**kwargs)
         return new_adapter
 
-    def add_writer(self, writer_config: Options):
+    def add_writer(self, writer_config: LoggerConfig):
         """动态添加写入器（线程安全）"""
         for writer in writer_config.write_to:
             if writer.name not in _writer_types:
                raise ValueError(f"Unsupported writer type: {writer.name}")
         self._setup_handlers(writer_config)
-       # self._setup_handlers(LoggerConfig(writers=[writer_config]))
 
  # ---- 核心日志方法  ----
     def info(self, message: str, **kwargs):

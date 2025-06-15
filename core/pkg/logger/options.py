@@ -1,8 +1,5 @@
-from typing import List, Optional, Callable, Any
-from dataclasses import dataclass, field
-
-from core.pkg.logger.config import FileWriterArgs
-
+from typing import List, Callable, Any
+from dataclasses import dataclass
 
 @dataclass
 class WriteTo:
@@ -20,9 +17,9 @@ Option = Callable[[Options], None]
 def set_default() -> Options:
     return Options(
         driver="loguru",
-        level="warn",
+        level="info",
         write_to=[
-            WriteTo(name="file", args=FileWriterArgs(path="temp/logs"))
+            WriteTo(name="console", args=None)
         ]
     )
 

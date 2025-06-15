@@ -2,6 +2,9 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional, Callable
 import os
 
+from core.pkg.logger.options import Options, WriteTo
+
+
 @dataclass
 class ConsoleWriterArgs:
     filter: Optional[Callable[[dict], bool]] = None  # 日志过滤函数
@@ -11,24 +14,34 @@ class ConsoleWriterArgs:
 #文件日志参数
 @dataclass
 class FileWriterArgs:
-    path: str = "logs/app.log"
-    max_size: int = 500  # MB
+    path: str = "logs/app_{time:YYYY-MM-DD}.log"
     backup_count: int = 10,
+    enqueue = True,
+    rotation :Optional[str] = "500 MB"
     retention: Optional[str] = "30 days"  # 日志保留时间
     compression: Optional[str] = None  # 压缩格式，如 'gz'
     encoding: Optional[str] = "utf-8"  # 文件编码
 
 
 @dataclass
-class LoggerConfig:
-    level: str = "INFO"
-    writers: List[Dict[str, Any]] = field(default_factory=lambda: [
-        {"name": "console"},
-        {"name": "file", "args": FileWriterArgs().__dict__}
-    ])
+class LoggerConfig(Options):
+    """日志配置，复用Options的字段定义"""
+    # level: str
+    # write_to: List[WriteTo]
+    # driver: str # 添加driver字段以完全匹配Options
 
-    @classmethod
-    def from_env(cls):
-        return cls(
-            level=os.getenv("LOG_LEVEL", "INFO")
+    # @classmethod
+    # def from_env(cls) -> 'LoggerConfig':
+    #     """从环境变量创建配置"""
+    #     return cls(
+    #         level=os.getenv("LOG_LEVEL", "INFO"),
+    #         # 可以添加其他环境变量配置
+    #     )
+
+    def to_options(self) -> Options:
+        """转换为Options对象"""
+        return Options(
+            driver=self.driver,
+            level=self.level,
+            write_to=self.write_to
         )
