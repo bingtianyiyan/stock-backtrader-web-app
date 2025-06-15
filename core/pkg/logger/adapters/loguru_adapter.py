@@ -4,11 +4,20 @@ from ..base import BaseLogger
 from ..config import FileWriterArgs, ConsoleWriterArgs, LoggerConfig
 import sys
 from pathlib import Path
-from typing import  Any, Optional, TypeVar, Callable
-from functools import wraps
+from typing import Optional, TypeVar
 
-T = TypeVar('T')
+from ..handlerbridge.loguru_handler import setup_compatible_logging
 
+# 在模块顶部定义默认格式
+DEFAULT_FORMAT = (
+    "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+    "<level>{level: <8}</level> | "
+    "<cyan>{thread.name}</cyan> | "
+    "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | "
+    "<cyan>{function}</cyan> |"
+    "<level>{message}</level> |"
+    "<yellow>{extra}</yellow>"
+)
 
 class LoguruAdapter(BaseLogger):
     def __init__(self, config: LoggerConfig):
@@ -21,6 +30,8 @@ class LoguruAdapter(BaseLogger):
         self._logger = logger
         if config is not None:
             self._setup_handlers(config)
+            #原生桥接日志 初始化（只需一次）
+            setup_compatible_logging()
 
     def _setup_handlers(self, config: LoggerConfig):
         """配置日志处理器"""
@@ -38,18 +49,14 @@ class LoguruAdapter(BaseLogger):
                 sys.stderr.write(f"Failed to init {writer.name} writer: {str(e)}\n")
 
     # ---- 标准写入器实现 ----
-    def _add_console_handler(self, args: ConsoleWriterArgs, default_level: str):
+    def _add_console_handler(self, args: Optional[ConsoleWriterArgs], default_level: str):
         """控制台日志（支持颜色/黑白模式）"""
+        args = args or ConsoleWriterArgs()
+        format = args.format if hasattr(args, 'format') and args.format is not None else DEFAULT_FORMAT
         logger.add(
             sys.stderr,
             level=default_level,
-            format=getattr(args, 'format',
-                              "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
-                              "<level>{level: <8}</level> | "
-                              "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | "
-                              "<level>{message}</level> |"
-                              "<yellow>{extra}</yellow>"
-                              ),
+            format=format,
             colorize=getattr(args, 'colorize', True),
             filter=getattr(args, 'filter',None)
         )
@@ -130,28 +137,29 @@ class LoguruAdapter(BaseLogger):
             logger.error(message)
 
 
-    # ---- 上下文和异常处理 ----
+    def critical(self, message: str, exc_info: Optional[bool] = False, **kwargs):
+        """CRITICAL级别日志（支持异常捕获）"""
+        if exc_info:
+            kwargs["exc_info"] = True  # 自动记录堆栈跟踪
+        if kwargs:
+            logger.bind(**kwargs).error(message)
+        else:
+            logger.error(message)
 
-    def catch(self,
-             reraise: bool = False,
-             onerror: Optional[Callable[[Exception], Any]] = None,
-             default: Optional[T] = None) -> Callable:
-        """异常捕获装饰器"""
-        @wraps(logger.catch)
-        def decorator(func: Callable[..., T]) -> Callable[..., T]:
-            @wraps(func)
-            def wrapper(*args, **kwargs) -> T:
-                try:
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    self.error(f"Exception in {func.__name__}", exc_info=True)
-                    if onerror:
-                        onerror(e)
-                    if reraise:
-                        raise
-                    return default
-            return wrapper
-        return decorator
+    # ---- 上下文和异常处理 ----
+    @property
+    def catch(self):
+        """
+        正确实现的catch装饰器属性
+        使用方式：
+            @log.catch
+            def func(): ...
+
+            或带参数：
+            @log.catch(reraise=True)
+            def func(): ...
+        """
+        return self._logger.catch
 
     # ---- 辅助方法 ----
     def with_fields(self, **kwargs) -> 'LoguruAdapter':

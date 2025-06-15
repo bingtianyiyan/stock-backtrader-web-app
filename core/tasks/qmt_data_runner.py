@@ -77,7 +77,7 @@ def download_data(download_tick=False):
 
 
 if __name__ == "__main__":
-    init_log("qmt_data_runner.log")
+    #init_log("qmt_data_runner.log")
     from apscheduler.schedulers.background import BackgroundScheduler
 
     sched = BackgroundScheduler()

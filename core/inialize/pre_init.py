@@ -5,7 +5,6 @@ import os
 import pkgutil
 import pprint
 import shutil
-from logging.handlers import RotatingFileHandler
 from typing import List
 
 import pandas as pd
@@ -35,6 +34,12 @@ def init_env(zvt_home: str, **kwargs) -> dict:
 
     :param zvt_home: home path for zvt
     """
+
+    # init config
+    init_config()
+    # init log
+    init_log()
+
     resource_path = os.path.join(zvt_home, "resources")
     tmp_path = os.path.join(zvt_home, "tmp")
     if not os.path.exists(resource_path):
@@ -46,24 +51,15 @@ def init_env(zvt_home: str, **kwargs) -> dict:
     zvt_env["zvt_home"] = zvt_home
     zvt_env["resource_path"] = resource_path
     zvt_env["tmp_path"] = tmp_path
-
-    # path for storing logs
-    zvt_env["log_path"] = os.path.join(zvt_home, "logs")
-    if not os.path.exists(zvt_env["log_path"]):
-        os.makedirs(zvt_env["log_path"])
     conf_obj = OmegaConf.create(zvt_env)
     configmanager.update_env(OmegaConf.to_object(conf_obj))
-
-    logger = init_log()
 
     pprint.pprint(zvt_env)
 
     init_resources(resource_path=resource_path)
-    # init config
-    init_config()
     # init plugin
     # init_plugins()
-    registerMeta()
+    #registerMeta()
 
     logger.info("init config done")
     return zvt_env
@@ -128,9 +124,7 @@ def registerMeta():
     else:
         logger.warning("QMT need run in Windows!")
 
-def pre_init():
-    print("pre_init")
-
+#先初始化config信息
 if os.getenv("TESTING_ZVT"):
     init_env(zvt_home=ZVT_TEST_HOME)
 

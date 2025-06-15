@@ -117,7 +117,7 @@ class ChinaETFDayKdataRecorder(FixedCycleDataRecorder):
 __all__ = ["ChinaETFDayKdataRecorder"]
 
 if __name__ == "__main__":
-    init_log("sina_china_etf_day_kdata.log")
+    #init_log("sina_china_etf_day_kdata.log")
     ChinaETFDayKdataRecorder(level=IntervalLevel.LEVEL_1DAY).run()
 
 

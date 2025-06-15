@@ -1,7 +1,6 @@
 # ---------------------- 使用示例 ----------------------
-from core.pkg.logger.config import FileWriterArgs, LoggerConfig
+from core.pkg.logger.config import FileWriterArgs, LoggerConfig, WriteTo
 from core.pkg.logger.logger import  new_log
-from core.pkg.logger.options import WriteTo
 
 
 #if __name__ == "__main__":

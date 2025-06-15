@@ -126,7 +126,7 @@ def record_data_and_build_stock_pools():
 
 
 if __name__ == "__main__":
-    init_log("sotck_pool_runner.log")
+    #init_log("sotck_pool_runner.log")
     record_data_and_build_stock_pools()
     sched.add_job(func=record_data_and_build_stock_pools, trigger="cron", hour=16, minute=00, day_of_week="mon-fri")
     sched.start()

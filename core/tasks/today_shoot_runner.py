@@ -55,7 +55,7 @@ def calculate_top():
 
 
 if __name__ == "__main__":
-    init_log("today_shoot_runner.log")
+    #init_log("today_shoot_runner.log")
     calculate_top()
     sched.add_job(func=calculate_top, trigger="cron", hour=9, minute=30, day_of_week="mon-fri")
     sched.start()

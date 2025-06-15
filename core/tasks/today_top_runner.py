@@ -95,7 +95,7 @@ def calculate_top(clear_em=True):
 
 
 if __name__ == "__main__":
-    init_log("today_top_runner.log")
+    #init_log("today_top_runner.log")
     calculate_top(clear_em=False)
     sched.add_job(func=calculate_top, trigger="cron", hour=9, minute=26, day_of_week="mon-fri")
     sched.start()

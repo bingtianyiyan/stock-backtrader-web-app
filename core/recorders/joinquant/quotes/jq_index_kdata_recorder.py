@@ -133,8 +133,7 @@ if __name__ == "__main__":
 
     level = IntervalLevel(args.level)
     codes = args.codes
-
-    init_log("jq_china_stock_{}_kdata.log".format(args.level))
+    #init_log("jq_china_stock_{}_kdata.log".format(args.level))
     JqChinaIndexKdataRecorder(level=level, sleeping_time=0, codes=codes, real_time=False).run()
 
     print(get_kdata(entity_id="index_sh_000001", limit=10))

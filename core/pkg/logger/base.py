@@ -49,3 +49,6 @@ class BaseLogger(ABC):
 
     def error(self, msg: str, exc_info: bool = False, **kwargs):
         self.log('ERROR', msg, exc_info=exc_info, **kwargs)
+
+    def critical(self, msg: str, exc_info: bool = False,  **kwargs):
+        self.log('CRITICAL', msg, exc_info=exc_info, **kwargs)
