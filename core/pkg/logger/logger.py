@@ -13,12 +13,7 @@ Log: Optional[LogHelper] = None
 #如果什么都不配置则初始化一个默认的日志对象，在还未读取配置文件时候作为临时日志对象去处理日志
 def new_default_log() -> BaseLogger:
     op = set_default()
-    log_config = LoggerConfig(
-        driver=op.driver,
-        level=op.level,
-        write_to=op.write_to
-    )
-    return init_loguru(log_config)
+    return init_loguru(op)
 
 #如果是配置了则读取这个对象去处理日志
 def new_log(log_config: LoggerConfig) -> BaseLogger:

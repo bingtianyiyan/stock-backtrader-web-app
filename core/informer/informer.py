@@ -9,7 +9,8 @@ from email.mime.text import MIMEText
 
 import requests
 
-from core.config.configmanager import configmanager
+from core.config.configmanager import ConfigContainer
+from core.config.fullconfig import FullConfig
 
 logger = logging.getLogger(__name__)
 
@@ -25,16 +26,17 @@ class EmailInformer(Informer):
         self.ssl = ssl
 
     def send_message_(self, to_user, title, body, **kwargs):
+        emailInfo = ConfigContainer.get_config(FullConfig).email
         if (
-            not configmanager.get().get("smtp_host")
-            or not configmanager.get().get("smtp_port")
-            or not configmanager.get().get("email_username")
-            or not configmanager.get().get("email_password")
+            not emailInfo.smtp_host
+            or not emailInfo.smtp_port
+            or not emailInfo.smtp_user
+            or not emailInfo.smtp_password
         ):
             logger.warning(f"Please set smtp_host/smtp_port/email_username/email_password in ~/zvt-home/config.json")
             return
-        host = configmanager.get().get("smtp_host")
-        port = configmanager.get().get("smtp_port")
+        host = emailInfo.smtp_host
+        port = emailInfo.smtp_port
 
         smtp_client = None
         try:
@@ -50,10 +52,10 @@ class EmailInformer(Informer):
                     smtp_client = smtplib.SMTP()
 
             smtp_client.connect(host=host, port=port)
-            smtp_client.login(configmanager.get().get("email_username"), configmanager.get().get("email_password"))
+            smtp_client.login(emailInfo.email_username, emailInfo.email_password)
             msg = MIMEMultipart("alternative")
             msg["Subject"] = Header(title).encode()
-            msg["From"] = "{} <{}>".format(Header("zvt").encode(), configmanager.get().get("email_username"))
+            msg["From"] = "{} <{}>".format(Header("zvt").encode(), emailInfo.email_username)
             if type(to_user) is list:
                 msg["To"] = ", ".join(to_user)
             else:
@@ -63,7 +65,7 @@ class EmailInformer(Informer):
 
             plain_text = MIMEText(body, _subtype="plain", _charset="UTF-8")
             msg.attach(plain_text)
-            smtp_client.sendmail(configmanager.get().get("email_username"), to_user, msg.as_string())
+            smtp_client.sendmail(emailInfo.email_username, to_user, msg.as_string())
         except Exception as e:
             logger.exception("send email failed", e)
         finally:
@@ -83,15 +85,17 @@ class EmailInformer(Informer):
             for step in range(step_size):
                 sub_to_user = to_user[sub_size * step : sub_size * (step + 1)]
                 if with_sender:
-                    sub_to_user.append(configmanager.get().get("email_username"))
+                    emailInfo = ConfigContainer.get_config(FullConfig).email
+                    sub_to_user.append(emailInfo.email_username)
                 self.send_message_(sub_to_user, title, body, **kwargs)
         else:
             self.send_message_(to_user, title, body, **kwargs)
 
 
 class WechatInformer(Informer):
+    wechatInfo = ConfigContainer.get_config(FullConfig).wechat
     GET_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}".format(
-        configmanager.get().get("wechat_app_id"), configmanager.get().get("wechat_app_secrect")
+        wechatInfo.wechat_app_id, wechatInfo.wechat_app_secrect
     )
 
     GET_TEMPLATE_URL = "https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token={}"
@@ -162,10 +166,11 @@ class QiyeWechatBot(Informer):
 
     def send_message(self, content):
         if not self.token:
-            if not configmanager.get().get("qiye_wechat_bot_token"):
+            wechatInfo = ConfigContainer.get_config(FullConfig).wechat
+            if not wechatInfo.qiye_wechat_bot_token:
                 logger.warning(f"Please set qiye_wechat_bot_token in ~/zvt-home/config.json")
                 return
-            self.token = configmanager.get().get("qiye_wechat_bot_token")
+            self.token = wechatInfo.qiye_wechat_bot_token
 
         msg = {
             "msgtype": "text",

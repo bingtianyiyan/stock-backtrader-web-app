@@ -2,7 +2,8 @@
 import eastmoneypy
 import requests
 
-from core.config.configmanager import configmanager
+from core.config.configmanager import ConfigContainer
+from core.config.fullconfig import FullConfig
 from core.contract.api import get_entities
 from core.informer import EmailInformer
 
@@ -16,7 +17,7 @@ def inform_email(entity_ids, entity_type, target_date, title, provider):
         infos = [f"{entity.name}({entity.code})" for entity in entities]
         msg = "\n".join(infos) + "\n"
 
-        EmailInformer().send_message(configmanager.get().get("email_username"), f"{target_date} {title}", msg)
+        EmailInformer().send_message(ConfigContainer.get_config(FullConfig).email.email_username, f"{target_date} {title}", msg)
 
 
 def add_to_eastmoney(codes, group, entity_type="stock", over_write=True, headers_list=None):

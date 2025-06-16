@@ -12,7 +12,8 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import sessionmaker, Session
 
-from core.config.configmanager import configmanager
+from core.config.configmanager import ConfigContainer
+from core.config.fullconfig import FullConfig
 from core.contract import IntervalLevel
 from core.contract import zvt_context
 from core.contract.schema import Mixin, TradableEntity
@@ -66,11 +67,11 @@ def get_db_engine(
 
     if not db_engine:
         # MySQL 连接配置 - 从环境变量或配置文件中获取
-        dbConfig = configmanager.get().get("mainConn")
+        dbConfig = ConfigContainer.get_config(FullConfig).mainConn
         mysql_config = (mysqlconfig().builder()
-                  .with_host(dbConfig["host"])
-                  .with_port(dbConfig["port"])
-                  .with_credentials(dbConfig["user"], dbConfig["password"])
+                  .with_host(dbConfig.host)
+                  .with_port(dbConfig.port)
+                  .with_credentials(dbConfig.username, dbConfig.password)
                   #.with_database(f"zvt_{provider}")
                   .with_database(db_name)
                   .build())
@@ -84,7 +85,7 @@ def get_db_engine(
             pool_pre_ping=True,  # 执行前检查连接是否有效
             pool_size=300,  # 连接池大小
             max_overflow=50,  # 最大溢出连接数
-            echo= configmanager.get().get("sqllog"),  # 是否输出SQL日志
+            echo= ConfigContainer.get_config(FullConfig).sqlinfo.sqllog,  # 是否输出SQL日志
             json_serializer=lambda obj: json.dumps(obj, ensure_ascii=False)
         )
         zvt_context.db_engine_map[engine_key] = db_engine

@@ -8,7 +8,8 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.sql.ddl import CreateTable
 from sqlalchemy.sql.expression import text
 
-from core.config.configmanager import configmanager
+from core.config.configmanager import ConfigContainer
+from core.config.fullconfig import FullConfig
 from core.contract import zvt_context
 from core.contract.api import get_db_engine, get_db_session_factory
 from core.contract.schema import TradableEntity, Mixin
@@ -105,7 +106,7 @@ def register_schema(
         schema_base.metadata.create_all(bind=engine)
         session_fac = get_db_session_factory(provider, db_name=db_name)
         session_fac.configure(bind=engine)
-    init_table = configmanager.get().get("initTable")
+    init_table = ConfigContainer.get_config(FullConfig).sqlinfo.initTable
     if not init_table:
         return
     for provider in providers:

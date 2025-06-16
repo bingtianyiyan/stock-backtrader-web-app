@@ -5,7 +5,8 @@ import pandas as pd
 from jqdatapy.api import get_token, get_bars
 
 from core.api.kdata import get_kdata_schema, generate_kdata_id, get_kdata
-from core.config.configmanager import configmanager
+from core.config.configmanager import  ConfigContainer
+from core.config.fullconfig import FullConfig
 from core.contract import IntervalLevel
 from core.contract.api import df_to_db
 from core.contract.recorder import FixedCycleDataRecorder
@@ -49,7 +50,8 @@ class JqChinaIndexKdataRecorder(FixedCycleDataRecorder):
         level = IntervalLevel(level)
         self.data_schema = get_kdata_schema(entity_type="index", level=level)
         self.jq_trading_level = to_jq_trading_level(level)
-        get_token(configmanager.get().get("jq_username"), configmanager.get().get("jq_password"), force=True)
+        jqInfo = ConfigContainer.get_config(FullConfig).jqdata
+        get_token(jqInfo.jq_username, jqInfo.jq_password, force=True)
         super().__init__(
             force_update,
             sleeping_time,

@@ -3,8 +3,8 @@ from core.pkg.logger.config import FileWriterArgs, LoggerConfig, WriteTo
 from core.pkg.logger.logger import  new_log
 
 
-#if __name__ == "__main__":
-def test_log():
+if __name__ == "__main__":
+#def test_log():
     # 获取当前文件所在目录的父级父级目录（即项目根目录）
     # BASE_DIR = Path(__file__).parent.parent.parent  # 根据实际层级调整
     # LOG_DIR = BASE_DIR / "logs"  # 项目根目录下的logs文件夹

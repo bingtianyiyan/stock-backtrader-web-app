@@ -4,17 +4,18 @@ from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from core.config.configmanager import configmanager
+from core.config.configmanager import ConfigContainer
+from core.config.fullconfig import FullConfig
 from core.db.mysqlx import mysqlconfig
 
 logger = logging.getLogger(__name__)
 
-jobConfig = configmanager.get().get("jobConn")
+jobConfig =   ConfigContainer.get_config(FullConfig).jobConn
 config = (mysqlconfig().builder()
-          .with_host(jobConfig["host"])
-          .with_port(jobConfig["port"])
-          .with_credentials(jobConfig["user"], jobConfig["password"]    )
-          .with_database(jobConfig["database"])
+          .with_host(jobConfig.host)
+          .with_port(jobConfig.port)
+          .with_credentials(jobConfig.username, jobConfig.password    )
+          .with_database(jobConfig.database)
           .with_table_name('zvt_scheduled_jobs')
           .build())
 # MySQL 数据库配置

@@ -4,7 +4,8 @@ import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from core.api.selector import get_entity_ids_by_filter
-from core.config.configmanager import configmanager
+from core.config.configmanager import  ConfigContainer
+from core.config.fullconfig import FullConfig
 from core.domain import (
     Stock,
     Stock1dHfqKdata,
@@ -37,7 +38,8 @@ def report_limit_up():
     df = LimitUpInfo.query_data(start_timestamp=timestamp, end_timestamp=timestamp, columns=["code", "name", "reason"])
     df["reason"] = df["reason"].str.split("+")
     print(df)
-    email_informer.send_message(configmanager.get().get("email_username"), f"{timestamp} 热门报告", f"{df}")
+    emailInfo = ConfigContainer.get_config(FullConfig).email
+    email_informer.send_message(emailInfo.email_username, f"{timestamp} 热门报告", f"{df}")
 
 
 def record_stock_data(data_provider="em", entity_provider="em", sleeping_time=0):

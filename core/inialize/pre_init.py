@@ -12,9 +12,6 @@ import pkg_resources
 
 __version__ = "1.0.0"  # 手动维护版本
 
-from omegaconf import OmegaConf
-
-from core.config.configmanager import configmanager
 from core.inialize.config import init_config
 
 from core.inialize.logger import init_log

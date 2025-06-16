@@ -3,7 +3,8 @@ import logging
 import time
 from typing import Type
 
-from core.config.configmanager import configmanager
+from core.config.configmanager import  ConfigContainer
+from core.config.fullconfig import FullConfig
 from core.informer import EmailInformer
 
 logger = logging.getLogger("__name__")
@@ -48,15 +49,17 @@ def run_data_recorder(
 
             msg = f"record {domain.__name__} success"
             logger.info(msg)
-            email_action.send_message(configmanager.get().get("email_username"), msg, msg)
+            emailInfo = ConfigContainer.get_config(FullConfig).email
+            email_action.send_message(emailInfo.email_username, msg, msg)
             break
         except Exception as e:
             logger.exception("report error:{}".format(e))
             time.sleep(60 * 2)
             retry_times = retry_times - 1
             if retry_times == 0:
+                emailInfo = ConfigContainer.get_config(FullConfig).email
                 email_action.send_message(
-                    configmanager.get().get("email_username"),
+                    emailInfo.email_username,
                     f"record {domain.__name__} error",
                     f"record {domain.__name__} error: {e}",
                 )

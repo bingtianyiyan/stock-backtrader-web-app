@@ -3,7 +3,8 @@ import pandas as pd
 from jqdatapy import get_token, get_money_flow
 
 from core.api.kdata import generate_kdata_id
-from core.config.configmanager import configmanager
+from core.config.configmanager import ConfigContainer
+from core.config.fullconfig import FullConfig
 from core.contract import IntervalLevel
 from core.contract.api import df_to_db
 from core.contract.recorder import FixedCycleDataRecorder
@@ -64,7 +65,8 @@ class JoinquantStockMoneyFlowRecorder(FixedCycleDataRecorder):
             return_unfinished,
         )
         self.compute_index_money_flow = compute_index_money_flow
-        get_token(configmanager.get().get("jq_username"), configmanager.get().get("jq_password"), force=True)
+        jqInfo = ConfigContainer.get_config(FullConfig).jqdata
+        get_token(jqInfo.jq_username, jqInfo.jq_password, force=True)
 
     def generate_domain_id(self, entity, original_data):
         return generate_kdata_id(entity_id=entity.id, timestamp=original_data["timestamp"], level=self.level)

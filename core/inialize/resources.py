@@ -3,9 +3,8 @@ import shutil
 from typing import List
 
 import pkg_resources
-from omegaconf import OmegaConf
 
-from core.config.configmanager import configmanager
+from core.config.configmanager import  ConfigContainer
 
 
 def init_resources():
@@ -23,5 +22,4 @@ def init_resources():
             shutil.copyfile(source_file, dst_file)
     zvt_env = {}
     zvt_env["resource_path"] = resource_path
-    conf_obj = OmegaConf.create(zvt_env)
-    configmanager.update_env(OmegaConf.to_object(conf_obj))
+    ConfigContainer.set_env(zvt_env)

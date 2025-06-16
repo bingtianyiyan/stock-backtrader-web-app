@@ -4,7 +4,8 @@ import pandas as pd
 from jqdatapy.api import get_token, get_bars
 
 from core.api.kdata import get_kdata_schema, generate_kdata_id, get_kdata
-from core.config.configmanager import configmanager
+from core.config.configmanager import ConfigContainer
+from core.config.fullconfig import FullConfig
 from core.contract import IntervalLevel, AdjustType
 from core.contract.api import df_to_db
 from core.contract.recorder import FixedCycleDataRecorder
@@ -73,8 +74,8 @@ class JqChinaStockKdataRecorder(FixedCycleDataRecorder):
         )
 
         self.adjust_type = adjust_type
-
-        get_token(configmanager.get().get("jq_username"), configmanager.get().get("jq_password"), force=True)
+        jqInfo = ConfigContainer.get_config(FullConfig).jqdata
+        get_token(jqInfo.jq_username, jqInfo.jq_password, force=True)
 
     def init_entities(self):
         super().init_entities()

@@ -5,7 +5,7 @@ from typing import List, Dict
 
 import pandas as pd
 
-from core.config.configmanager import configmanager
+from core.config.configmanager import ConfigContainer
 from core.contract.api import df_to_db
 from core.domain import Block
 from core.tag.common import StockPoolType
@@ -13,7 +13,7 @@ from core.tag.tag_schemas import MainTagInfo, SubTagInfo, HiddenTagInfo, StockPo
 
 
 def _get_default_industry_main_tag_mapping() -> Dict[str, str]:
-    with open(os.path.join(configmanager.get_env().get("resource_path"), "industry_main_tag_mapping.json"), encoding="utf-8") as f:
+    with open(os.path.join(ConfigContainer.get_env("resource_path"), "industry_main_tag_mapping.json"), encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -27,7 +27,7 @@ def _get_default_main_tag_industry_mapping() -> Dict[str, List[str]]:
 
 
 def _get_default_concept_main_tag_mapping() -> Dict[str, str]:
-    with open(os.path.join(configmanager.get_env().get("resource_path"), "concept_main_tag_mapping.json"), encoding="utf-8") as f:
+    with open(os.path.join(ConfigContainer.get_env("resource_path"), "concept_main_tag_mapping.json"), encoding="utf-8") as f:
         return json.load(f)
 
 
