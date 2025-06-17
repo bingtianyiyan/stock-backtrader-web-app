@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, Float, Integer, Boolean, JSON
+from sqlalchemy import Column, Float, Integer, Boolean, JSON, BOOLEAN
+from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.orm import declarative_base
 from core.contract.data_string import String  # 使用自定义 String
 from core.contract import Mixin
@@ -46,11 +49,11 @@ class StockQuote(StockQuoteBase, StockKdataCommon):
     #: 最新价
     price = Column(Float)
     #: 是否涨停
-    is_limit_up = Column(Boolean)
+    is_limit_up = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 封涨停金额
     limit_up_amount = Column(Float)
     #: 是否跌停
-    is_limit_down = Column(Boolean)
+    is_limit_down = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 封跌停金额
     limit_down_amount = Column(Float)
     #: 5挡卖单金额
@@ -70,11 +73,11 @@ class StockQuoteLog(StockQuoteBase, StockKdataCommon):
     #: 最新价
     price = Column(Float)
     #: 是否涨停
-    is_limit_up = Column(Boolean)
+    is_limit_up = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 封涨停金额
     limit_up_amount = Column(Float)
     #: 是否跌停
-    is_limit_down = Column(Boolean)
+    is_limit_down = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 封跌停金额
     limit_down_amount = Column(Float)
     #: 5挡卖单金额
@@ -107,9 +110,9 @@ class Stock1mQuote(StockQuoteBase, Mixin):
     # 换手率
     turnover_rate = Column(Float)
     #: 是否涨停
-    is_limit_up = Column(Boolean)
+    is_limit_up = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 是否跌停
-    is_limit_down = Column(Boolean)
+    is_limit_down = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
 
 
 register_schema(providers=["qmt"], db_name=stock_db_name, schema_base=StockQuoteBase, entity_type="stock")

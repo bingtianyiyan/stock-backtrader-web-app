@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, DateTime, Boolean, Float, Integer, ForeignKey
+from sqlalchemy import Column, DateTime, Boolean, Float, Integer, ForeignKey, BOOLEAN, TIMESTAMP
+from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship
 from core.contract.data_string import String  # 使用自定义 String
@@ -21,12 +24,12 @@ class TraderInfo(TraderBase, Mixin):
     trader_name = Column(String(length=128))
 
     entity_type = Column(String(length=128))
-    start_timestamp = Column(DateTime)
-    end_timestamp = Column(DateTime)
+    start_timestamp = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
+    end_timestamp = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
     provider = Column(String(length=32))
     level = Column(String(length=32))
-    real_time = Column(Boolean)
-    kdata_use_begin_time = Column(Boolean)
+    real_time = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
+    kdata_use_begin_time = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     kdata_adjust_type = Column(String(length=32))
 
 
@@ -57,7 +60,7 @@ class AccountStats(TraderBase, Mixin):
     profit_rate = Column(Float)
 
     #: 收盘计算
-    closing = Column(Boolean)
+    closing = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
 
 
 #: the position for specific entity of every day

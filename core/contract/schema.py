@@ -4,8 +4,11 @@ from datetime import timedelta
 from typing import List, Union
 
 import pandas as pd
-from sqlalchemy import Column, DateTime, Float
+from sqlalchemy import Column, DateTime, Float, TIMESTAMP
 from sqlalchemy.orm import Session
+from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from core.contract import IntervalLevel
 from core.utils.time_utils import date_and_time, is_same_time, now_pd_timestamp
 from core.contract.data_string import String  # 使用自定义 String
@@ -21,7 +24,7 @@ class Mixin(object):
     entity_id = Column(String)
 
     #: the meaning could be different for different case,most time it means 'happen time'
-    timestamp = Column(DateTime)
+    timestamp = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
 
     # unix epoch,same meaning with timestamp
     # ts = Column(BIGINT)
@@ -298,9 +301,9 @@ class Mixin(object):
 
 class NormalMixin(Mixin):
     #: the record created time in db
-    created_timestamp = Column(DateTime, default=pd.Timestamp.now())
+    created_timestamp = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'), default=pd.Timestamp.now())
     #: the record updated time in db, some recorder would check it for whether need to refresh
-    updated_timestamp = Column(DateTime)
+    updated_timestamp = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
 
 
 class Entity(Mixin):
@@ -313,9 +316,9 @@ class Entity(Mixin):
     #: 名字
     name = Column(String(length=128))
     #: 上市日
-    list_date = Column(DateTime)
+    list_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
     #: 退市日
-    end_date = Column(DateTime)
+    end_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
 
 
 class TradableEntity(Entity):
@@ -470,9 +473,9 @@ class ActorEntity(Entity):
 
 class NormalEntityMixin(TradableEntity):
     #: the record created time in db
-    created_timestamp = Column(DateTime, default=pd.Timestamp.now())
+    created_timestamp = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'), default=pd.Timestamp.now())
     #: the record updated time in db, some recorder would check it for whether need to refresh
-    updated_timestamp = Column(DateTime)
+    updated_timestamp = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
 
 
 class Portfolio(TradableEntity):
@@ -530,7 +533,7 @@ class PortfolioStockHistory(PortfolioStock):
     #: 报告期,season1,half_year,season3,year
     report_period = Column(String(length=32))
     #: 3-31,6-30,9-30,12-31
-    report_date = Column(DateTime)
+    report_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
 
     #: 占净值比例
     proportion = Column(Float)

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from sqlalchemy import Column, JSON, Boolean, Float, Integer, Text
+from sqlalchemy import Column, JSON, Boolean, Float, Integer, Text, BOOLEAN
+from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.orm import declarative_base
 from core.contract.data_string import String  # 使用自定义 String
 from core.contract import Mixin
@@ -63,7 +66,7 @@ class StockTags(StockTagsBase, Mixin):
 
     active_hidden_tags = Column(JSON)
     hidden_tags = Column(JSON)
-    set_by_user = Column(Boolean, default=False)
+    set_by_user = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'), default=False)
 
 
 class StockSystemTags(StockTagsBase, Mixin):
@@ -73,25 +76,25 @@ class StockSystemTags(StockTagsBase, Mixin):
     #: 名字
     name = Column(String(length=128))
     #: 减持
-    recent_reduction = Column(Boolean)
+    recent_reduction = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 增持
-    recent_acquisition = Column(Boolean)
+    recent_acquisition = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 解禁
-    recent_unlock = Column(Boolean)
+    recent_unlock = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 增发配股
-    recent_additional_or_rights_issue = Column(Boolean)
+    recent_additional_or_rights_issue = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 业绩利好
-    recent_positive_earnings_news = Column(Boolean)
+    recent_positive_earnings_news = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 业绩利空
-    recent_negative_earnings_news = Column(Boolean)
+    recent_negative_earnings_news = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 上榜次数
     recent_dragon_and_tiger_count = Column(Integer)
     #: 违规行为
-    recent_violation_alert = Column(Boolean)
+    recent_violation_alert = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 利好
-    recent_positive_news = Column(Boolean)
+    recent_positive_news = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 利空
-    recent_negative_news = Column(Boolean)
+    recent_negative_news = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 新闻总结
     recent_news_summary = Column(JSON)
 
@@ -116,7 +119,7 @@ class TagStats(StockTagsBase, Mixin):
     turnover = Column(Float)
     entity_count = Column(Integer)
     position = Column(Integer)
-    is_main_line = Column(Boolean)
+    is_main_line = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     main_line_continuous_days = Column(Integer)
     entity_ids = Column(JSON)
 

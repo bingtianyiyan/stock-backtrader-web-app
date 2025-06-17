@@ -2,6 +2,9 @@
 
 from sqlalchemy import Column, DateTime, BigInteger, Float
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from core.contract.data_string import String  # 使用自定义 String
 from core.contract import TradableEntity
 from core.contract.register import register_schema, register_entity
@@ -15,7 +18,7 @@ StockMetaBase = declarative_base()
 class Stock(StockMetaBase, TradableEntity):
     __tablename__ = "stock"
     #: 股东上次更新时间
-    holder_modified_date = Column(DateTime)
+    holder_modified_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
     #: 控股股东
     controlling_holder = Column(String)
     #: 实际控制人
@@ -38,7 +41,7 @@ class StockDetail(StockMetaBase, TradableEntity):
     area_indices = Column(String)
 
     #: 成立日期
-    date_of_establishment = Column(DateTime)
+    date_of_establishment = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
     #: 公司简介
     profile = Column(String(length=1024))
     #: 主营业务

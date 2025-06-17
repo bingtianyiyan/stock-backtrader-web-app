@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Column, DateTime, Float
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from core.contract.data_string import String  # 使用自定义 String
 from core.contract import Mixin
 from core.contract.register import register_schema
@@ -34,7 +37,7 @@ class TopTenTradableHolder(HolderBase, Mixin):
     code = Column(String(length=32))
 
     report_period = Column(String(length=32))
-    report_date = Column(DateTime)
+    report_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
 
     #: 股东代码
     holder_code = Column(String(length=32))
@@ -57,7 +60,7 @@ class TopTenHolder(HolderBase, Mixin):
     code = Column(String(length=32))
 
     report_period = Column(String(length=32))
-    report_date = Column(DateTime)
+    report_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
 
     #: 股东代码
     holder_code = Column(String(length=32))
@@ -80,7 +83,7 @@ class InstitutionalInvestorHolder(HolderBase, Mixin):
     code = Column(String(length=32))
 
     report_period = Column(String(length=32))
-    report_date = Column(DateTime)
+    report_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
 
     #: 机构类型
     institutional_investor_type = Column(String(length=64))

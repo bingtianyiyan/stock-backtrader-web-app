@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Column, DateTime, Float
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from core.contract.data_string import String  # 使用自定义 String
 from core.contract import Mixin
 from core.contract.register import register_schema
@@ -37,11 +40,11 @@ class DividendDetail(DividendFinancingBase, Mixin):
     code = Column(String(length=32))
 
     #: 公告日
-    announce_date = Column(DateTime)
+    announce_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
     #: 股权登记日
-    record_date = Column(DateTime)
+    record_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
     #: 除权除息日
-    dividend_date = Column(DateTime)
+    dividend_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
 
     #: 方案
     dividend = Column(String(length=128))

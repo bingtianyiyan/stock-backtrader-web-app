@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Column, Float, String, Boolean, Integer
-
+from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from core.contract import Mixin
 
 
@@ -20,9 +22,9 @@ class ZenFactorCommon(Mixin):
     turnover = Column(Float)
 
     # 笔的底
-    bi_di = Column(Boolean)
+    bi_di = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     # 笔的顶
-    bi_ding = Column(Boolean)
+    bi_ding = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     # 记录笔顶/底分型的值，bi_di取low,bi_ding取high,其他为None,绘图时取有值的连线即为 笔
     bi_value = Column(Float)
     # 笔的变化
@@ -33,8 +35,8 @@ class ZenFactorCommon(Mixin):
     bi_interval = Column(Integer)
 
     # 记录临时分型，不变
-    tmp_ding = Column(Boolean)
-    tmp_di = Column(Boolean)
+    tmp_ding = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
+    tmp_di = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     # 分型的力度
     fenxing_power = Column(Float)
 
@@ -65,9 +67,9 @@ class ZenFactorCommon(Mixin):
     duan_state = Column(String(length=32))
 
     # 段的底
-    duan_di = Column(Boolean)
+    duan_di = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     # 段的顶
-    duan_ding = Column(Boolean)
+    duan_ding = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     # 记录段顶/底的值，为duan_di时取low,为duan_ding时取high,其他为None,绘图时取有值的连线即为 段
     duan_value = Column(Float)
     # 段的变化

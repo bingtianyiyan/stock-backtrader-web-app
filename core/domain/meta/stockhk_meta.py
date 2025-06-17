@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, Boolean
+from sqlalchemy import Column, Boolean, BOOLEAN
+from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.orm import declarative_base
 
 from core.contract import TradableEntity
@@ -14,7 +17,7 @@ StockhkMetaBase = declarative_base()
 class Stockhk(StockhkMetaBase, TradableEntity):
     __tablename__ = "stockhk"
     #: 是否属于港股通
-    south = Column(Boolean)
+    south = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
 
     @classmethod
     def get_trading_t(cls):

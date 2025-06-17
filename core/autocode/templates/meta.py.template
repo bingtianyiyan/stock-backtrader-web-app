@@ -11,9 +11,9 @@ ${entity_class}MetaBase = declarative_base()
 class ${entity_class}(EntityMixin, ${entity_class}MetaBase):
     __tablename__ = '${entity_type}'
     # 上市日
-    list_date = Column(DateTime)
+    list_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
     # 退市日
-    end_date = Column(DateTime)
+    end_date = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
 
 
 register_schema(providers=${providers}, db_name='${entity_type}_meta', schema_base=${entity_class}MetaBase)

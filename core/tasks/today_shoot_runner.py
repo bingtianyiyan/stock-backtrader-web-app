@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import time
-
+import core.inialize.pre_init
 import eastmoneypy
 from apscheduler.schedulers.background import BackgroundScheduler
 

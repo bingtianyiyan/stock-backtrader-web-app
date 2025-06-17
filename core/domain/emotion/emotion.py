@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column,Integer, DateTime, Boolean, Float
+from sqlalchemy import Column, Integer, DateTime, Boolean, Float, BOOLEAN
+from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.orm import declarative_base
 from core.contract.data_string import String  # 使用自定义 String
 from core.contract import Mixin
@@ -15,15 +18,15 @@ class LimitUpInfo(EmotionBase, Mixin):
     code = Column(String(length=32))
     name = Column(String(length=32))
     #: 是否新股
-    is_new = Column(Boolean)
+    is_new = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 是否回封，是就是打开过，否相反
-    is_again_limit = Column(Boolean)
+    is_again_limit = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 涨停打开次数,0代表封住就没开板
     open_count = Column(Integer)
     #: 首次封板时间
-    first_limit_up_time = Column(DateTime)
+    first_limit_up_time = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
     #: 最后封板时间
-    last_limit_up_time = Column(DateTime)
+    last_limit_up_time = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
     #: 涨停类型:换手板，一字板
     limit_up_type = Column(String)
     #: 封单金额
@@ -50,9 +53,9 @@ class LimitDownInfo(EmotionBase, Mixin):
     code = Column(String(length=32))
     name = Column(String(length=32))
     #: 是否新股
-    is_new = Column(Boolean)
+    is_new = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 是否回封，是就是打开过，否相反
-    is_again_limit = Column(Boolean)
+    is_again_limit = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'))
     #: 流通市值
     currency_value = Column(Float)
     #: 涨幅

@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, JSON, Boolean, DateTime, Integer, Text
+from sqlalchemy import Column, JSON, Boolean, DateTime, Integer, Text, BOOLEAN
+from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.orm import declarative_base
 from core.contract.data_string import String  # 使用自定义 String
 from core.contract import Mixin
@@ -23,14 +26,14 @@ class StockNews(NewsBase, Mixin):
     #: 新闻解读
     news_analysis = Column(JSON)
     #: 用户设置为忽略
-    ignore_by_user = Column(Boolean, default=False)
+    ignore_by_user = Column(Boolean().with_variant(BOOLEAN, 'postgresql').with_variant(TINYINT(1), 'mysql'), default=False)
 
 
 class StockHotTopic(NewsBase, Mixin):
     __tablename__ = "stock_hot_topic"
 
     #: 出现时间
-    created_timestamp = Column(DateTime)
+    created_timestamp = Column(DateTime().with_variant(TIMESTAMP(timezone=True), 'postgresql'))
     #: 热度排行
     position = Column(Integer)
     #: 相关标的

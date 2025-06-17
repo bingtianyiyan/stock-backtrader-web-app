@@ -2,7 +2,7 @@
 import logging
 import time
 from typing import List
-
+import core.inialize.pre_init
 import eastmoneypy
 from apscheduler.schedulers.background import BackgroundScheduler
 
