@@ -245,7 +245,7 @@ class Mixin(object):
                 recorder_class = cls.provider_map_recorder[cls.providers[provider_index]]
 
             # get args for specific recorder class
-            from core.contract import TimeSeriesDataRecorder
+            from core.contract.recorder import TimeSeriesDataRecorder
 
             if issubclass(recorder_class, TimeSeriesDataRecorder):
                 args = [
@@ -264,7 +264,7 @@ class Mixin(object):
                     kw[arg] = tmp
 
             #: FixedCycleDataRecorder
-            from core.contract import FixedCycleDataRecorder
+            from core.contract.recorder import FixedCycleDataRecorder
 
             if issubclass(recorder_class, FixedCycleDataRecorder):
                 #: contract:

@@ -104,7 +104,13 @@ class DatabaseManager:
             echo=config.extra.echo,
             json_serializer=lambda obj: json.dumps(obj, ensure_ascii=False)
         )
-
+        # 添加方言特定配置
+        if config.db_type == "postgresql":
+            engine.dialect.identifier_preparer.initial_quote = '"'
+            engine.dialect.identifier_preparer.final_quote = '"'
+        elif config.db_type == mysql:
+            engine.dialect.identifier_preparer.initial_quote = '`'
+            engine.dialect.identifier_preparer.final_quote = '`'
         return engine
 
     @classmethod

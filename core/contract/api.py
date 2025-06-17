@@ -5,7 +5,7 @@ import platform
 from typing import List, Union, Type
 
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, bindparam
 from sqlalchemy import func, exists, and_
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -571,12 +571,25 @@ def df_to_db(
         if need_check:
             if force_update:
                 ids = df_current["id"].tolist()
-                if len(ids) == 1:
-                    sql = text(f'delete from `{data_schema.__tablename__}` where id = "{ids[0]}"')
-                else:
-                    sql = text(f"delete from `{data_schema.__tablename__}` where id in {tuple(ids)}")
+                if not ids:  # 空列表检查
+                    return 0
+                tablename = data_schema.__tablename__
 
-                session.execute(sql)
+                if len(ids) == 1:
+                    # 单ID删除
+                    sql = text(f'DELETE FROM {tablename} WHERE id = :id')
+                    session.execute(sql, {'id': ids[0]})
+                else:
+                    # 多ID删除
+                    if session.bind.dialect.name == 'postgresql':
+                        # PostgreSQL 使用 ANY 数组
+                        sql = text(f'DELETE FROM {tablename} WHERE id = ANY(:ids)')
+                        session.execute(sql, {'ids': ids})
+                    else:
+                        # MySQL 和其他数据库使用 IN
+                        sql = text(f'DELETE FROM {tablename} WHERE id IN :ids')
+                        session.execute(sql, {'ids': tuple(ids)})
+                #session.execute(sql)
             else:
                 current = get_data(
                     session=session,

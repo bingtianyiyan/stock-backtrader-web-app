@@ -68,3 +68,24 @@ def is_finished_kdata_timestamp(timestamp, level: IntervalLevel):
     if level.floor_timestamp(timestamp) == timestamp:
         return True
     return False
+
+
+def cast_booleans(df):
+    """强制转换布尔字段（处理所有可能的情况）"""
+    bool_cols = ['is_new', 'is_again_limit']
+
+    for col in bool_cols:
+        if col in df.columns:
+            # 处理各种可能的输入格式：
+            # 1. 字符串 'true'/'false'
+            # 2. 整数 0/1
+            # 3. Python True/False
+            # 4. Pandas NA/NULL
+            df[col] = (
+                df[col]
+                .astype(str)
+                .str.lower()
+                .map({'true': True, 'false': False, '1': True, '0': False})
+                .astype('boolean')  # Pandas扩展布尔类型（支持NA）
+            )
+    return df

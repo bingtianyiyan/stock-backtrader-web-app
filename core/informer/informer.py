@@ -30,8 +30,8 @@ class EmailInformer(Informer):
         if (
             not emailInfo.smtp_host
             or not emailInfo.smtp_port
-            or not emailInfo.smtp_user
-            or not emailInfo.smtp_password
+            or not emailInfo.email_username
+            or not emailInfo.email_password
         ):
             logger.warning(f"Please set smtp_host/smtp_port/email_username/email_password in ~/zvt-home/config.json")
             return

@@ -20,10 +20,8 @@ class EMStockRecorder(Recorder):
             # df_delist = df[df["name"].str.contains("退")]
             if pd_is_not_null(df):
                 for item in df[["id", "name"]].values.tolist():
-                    id = item[0]
-                    name = item[1]
-                    sql = text(f'update stock set name = "{name}" where id = "{id}"')
-                    self.session.execute(sql)
+                    sql = text('UPDATE stock SET name = :name WHERE id = :id')
+                    self.session.execute(sql,{'name': item[1], 'id': item[0]})
                     self.session.commit()
             self.logger.info(df)
             df_to_db(df=df, data_schema=self.data_schema, provider=self.provider, force_update=self.force_update)

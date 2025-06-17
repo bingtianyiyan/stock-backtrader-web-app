@@ -43,7 +43,7 @@ def init_env():
 
     # init plugin
     # init_plugins()
-    #registerMeta()
+    registerMeta()
 
     logger.info("init config done")
 

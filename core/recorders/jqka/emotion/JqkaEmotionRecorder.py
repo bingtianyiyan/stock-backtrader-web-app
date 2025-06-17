@@ -7,6 +7,7 @@ import pandas as pd
 from core.api.utils import china_stock_code_to_id
 from core.contract.api import df_to_db
 from core.contract.recorder import TimestampsDataRecorder
+from core.contract.utils import cast_booleans
 from core.domain import Stock
 from core.domain.emotion.emotion import LimitUpInfo, LimitDownInfo, Emotion
 from core.recorders.jqka import jqka_api
@@ -75,6 +76,7 @@ class JqkaLimitUpRecorder(TimestampsDataRecorder):
                     }
                     records.append(record)
                 df = pd.DataFrame.from_records(records)
+                df = cast_booleans(df)
                 df_to_db(
                     data_schema=self.data_schema,
                     df=df,
