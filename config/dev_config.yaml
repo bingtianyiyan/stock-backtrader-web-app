@@ -1,23 +1,66 @@
 app:
   debug: true
   env: dev
-mainConn:
-  host: "127.0.0.1"
-  port: 3306
-  username: "root"
-  password: "root"
-  extra:
-    pool_size: 20
-    charset: "utf8mb4"
-jobConn:
-  host: "127.0.0.1"
-  port: 3306
-  username: "root"
-  password: "root"
-  database: "zvt_jobs"
-  extra:
-    pool_size: 20
-    charset: "utf8mb4"
+db_configs:
+  - db_type: "mysql"
+    db_action: "mainConn"
+    host: "127.0.0.1"
+    port: 3306
+    username: "root"
+    password: "root"
+    database: "tiny_zvt_stock"
+    extra:
+      pool_size: 20
+      charset: "utf8mb4"
+      max_overflow: 20
+      pool_recycle: 1800
+    mysql_config:
+      ssl_mode: "disabled"
+
+  - db_type: "mysql"
+    db_action: "jobConn"
+    host: "127.0.0.1"
+    port: 3306
+    username: "root"
+    password: "root"
+    database: "zvt_jobs"
+    extra:
+      pool_size: 20
+      charset: "utf8mb4"
+      max_overflow: 20
+      pool_recycle: 1800
+
+#  - db_type: "postgresql"
+#    db_action: "analytics"
+#    host: "127.0.0.1"
+#    port: 5432
+#    username: "postgres"
+#    password: "postgres"
+#    database: "analytics_db"
+#    extra:
+#      pool_size: 10
+#    pg_config:
+#      schema: "analytics"
+#      sslmode: "require"
+
+
+#mainConn:
+#  host: "127.0.0.1"
+#  port: 3306
+#  username: "root"
+#  password: "root"
+#  extra:
+#    pool_size: 20
+#    charset: "utf8mb4"
+#jobConn:
+#  host: "127.0.0.1"
+#  port: 3306
+#  username: "root"
+#  password: "root"
+#  database: "zvt_jobs"
+#  extra:
+#    pool_size: 20
+#    charset: "utf8mb4"
 logger:
   driver: loguru
   level: debug
@@ -38,7 +81,7 @@ logger:
 
 sqlinfo:
   sqllog: false
-  initTable: false
+  initTable: true
 jqdata:
   jq_username: ""
   jq_password: ""

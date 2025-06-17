@@ -13,6 +13,7 @@ from core.config.fullconfig import FullConfig
 from core.contract import zvt_context
 from core.contract.api import get_db_engine, get_db_session_factory
 from core.contract.schema import TradableEntity, Mixin
+from core.db.db_type import sqlite, mysql, postgresql
 from core.utils.utils import add_to_map_list
 
 
@@ -106,7 +107,12 @@ def register_schema(
         schema_base.metadata.create_all(bind=engine)
         session_fac = get_db_session_factory(provider, db_name=db_name)
         session_fac.configure(bind=engine)
-    init_table = ConfigContainer.get_config(FullConfig).sqlinfo.initTable
+     #筛选出db类型
+    configs = ConfigContainer.get_config(FullConfig)
+    if not configs.db_configs:
+        raise ValueError("db_configs should provider")
+    config = next(filter(lambda x: x.database == db_name, configs.db_configs), None)
+    init_table = configs.sqlinfo.initTable
     if not init_table:
         return
     for provider in providers:
@@ -123,27 +129,49 @@ def register_schema(
             index_list = []
             with engine.connect() as con:
                 # FIXME: close WAL mode for saving space, most of time no need to write in multiple process
-                # if db_name in ("zvt_info", "stock_news", "stock_tags"):
-                #    # con.execute(text("PRAGMA journal_mode=WAL;"))
-                #    pass
-                # else:
-                #     con.execute(text("PRAGMA journal_mode=DELETE;"))
-                # Get index information in MySQL
-                #rs = con.execute(text("PRAGMA INDEX_LIST('{}')".format(table_name)))
-                # For MySQL, we adjust settings based on the storage engine
-                if db_name in ("zvt_info", "stock_news", "stock_tags"):
-                    # For tables that need better write performance
-                    con.execute(text("SET GLOBAL innodb_flush_log_at_trx_commit = 2;"))  # Less durable but faster
-                    con.execute(text("SET GLOBAL sync_binlog = 0;"))  # Disable binary log syncing for performance
-                else:
-                    # For tables where durability is more important than performance
-                    con.execute(text("SET GLOBAL innodb_flush_log_at_trx_commit = 1;"))  # Fully ACID compliant
-                    con.execute(text("SET GLOBAL sync_binlog = 1;"))  # Safe binary log syncing
+                # Database configuration based on database type
+                if config.db_type == sqlite:
+                    # SQLite specific configurations
+                    if db_name in ("zvt_info", "stock_news", "stock_tags"):
+                        # For SQLite WAL mode (better for concurrent access)
+                        con.execute(text("PRAGMA journal_mode=WAL;"))
+                    else:
+                        # For SQLite DELETE mode (saves space)
+                        con.execute(text("PRAGMA journal_mode=DELETE;"))
 
-                # MySQL doesn't have PRAGMA INDEX_LIST equivalent, you can use SHOW INDEX instead
-                rs = con.execute(text(f"SHOW INDEX FROM {table_name}"))
-                for row in rs:
-                    index_list.append(row[2])
+                    # Get index information for SQLite
+                    rs = con.execute(text(f"PRAGMA index_list('{table_name}')"))
+                    for row in rs:
+                        index_list.append(row[1])  # SQLite returns index name in position 1
+
+                elif config.db_type == mysql:
+                    # MySQL specific configurations
+                    if db_name in ("zvt_info", "stock_news", "stock_tags"):
+                        # For tables that need better write performance
+                        con.execute(text("SET GLOBAL innodb_flush_log_at_trx_commit = 2;"))  # Less durable but faster
+                        con.execute(text("SET GLOBAL sync_binlog = 0;"))  # Disable binary log syncing for performance
+                    else:
+                        # For tables where durability is more important than performance
+                        con.execute(text("SET GLOBAL innodb_flush_log_at_trx_commit = 1;"))  # Fully ACID compliant
+                        con.execute(text("SET GLOBAL sync_binlog = 1;"))  # Safe binary log syncing
+
+                    # Get index information for MySQL
+                    rs = con.execute(text(f"SHOW INDEX FROM {table_name}"))
+                    for row in rs:
+                        index_list.append(row[2])  # MySQL returns index name in position 2
+
+                elif config.db_type == postgresql:
+                    # PostgreSQL specific configurations
+                    # PostgreSQL doesn't need WAL mode configuration as it always uses WAL
+
+                    # Get index information for PostgreSQL
+                    rs = con.execute(text(
+                        f"SELECT indexname FROM pg_indexes WHERE tablename = '{table_name}'"
+                    ))
+                    for row in rs:
+                        index_list.append(row[0])  # PostgreSQL returns just the index name
+                else:
+                    raise ValueError("Unsupported database type")
 
                 try:
                     # Using migration tool like Alembic is too complex

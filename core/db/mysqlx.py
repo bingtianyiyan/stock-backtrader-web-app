@@ -74,24 +74,3 @@ class mysqlconfig:
         def build(self):
             return mysqlconfig(**self._config)
 
-# # 自定义配置
-# custom_config = {
-#     'host': '192.168.1.100',
-#     'port': 3307,
-#     'user': 'zvt_admin',
-#     'password': 'secure_password',
-#     'database': 'zvt_prod',
-#     'table_name': 'zvt_custom_jobs',
-#     'pool_size': 15,
-#     'extra_params': {'connect_timeout': 30}
-# }
-#
-# mysql_config = mysqlconfig.from_dict(custom_config)
-
-# config = (mysqlconfig()
-#           .with_host('db.example.com')
-#           .with_port(3307)
-#           .with_credentials('admin', 's3cr3t')
-#           .with_database('zvt_production')
-#           .with_table_name('custom_scheduler_jobs')
-#           .build())

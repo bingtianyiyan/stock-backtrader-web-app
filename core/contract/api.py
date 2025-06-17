@@ -17,7 +17,7 @@ from core.config.fullconfig import FullConfig
 from core.contract import IntervalLevel
 from core.contract import zvt_context
 from core.contract.schema import Mixin, TradableEntity
-from core.db.mysqlx import mysqlconfig
+from core.db.databasemanager import DatabaseManager
 from core.utils.pd_utils import pd_is_not_null, index_df
 from core.utils.time_utils import to_pd_timestamp
 from sqlalchemy.sql import text  # 添加这行导入
@@ -52,69 +52,22 @@ def get_db_engine(
     if data_schema:
         db_name = _get_db_name(data_schema=data_schema)
 
-    # provider_path = os.path.join(data_path, provider)
-    # if not os.path.exists(provider_path):
-    #     os.makedirs(provider_path)
-    # db_path = os.path.join(provider_path, "{}_{}.db?check_same_thread=False".format(provider, db_name))
+    if not db_name:
+        raise ValueError("Either db_name or data_schema must be provided")
 
     engine_key = "{}_{}".format(provider, db_name)
     db_engine = zvt_context.db_engine_map.get(engine_key)
-    # if not db_engine:
-    #     db_engine = create_engine(
-    #         "sqlite:///" + db_path, echo=False, json_serializer=lambda obj: json.dumps(obj, ensure_ascii=False)
-    #     )
-    #     zvt_context.db_engine_map[engine_key] = db_engine
 
     if not db_engine:
-        # MySQL 连接配置 - 从环境变量或配置文件中获取
-        dbConfig = ConfigContainer.get_config(FullConfig).mainConn
-        mysql_config = (mysqlconfig().builder()
-                  .with_host(dbConfig.host)
-                  .with_port(dbConfig.port)
-                  .with_credentials(dbConfig.username, dbConfig.password)
-                  #.with_database(f"zvt_{provider}")
-                  .with_database(db_name)
-                  .build())
-
-        db_url = mysql_config.get_connection_url()
-
-        # 创建引擎
-        db_engine = create_engine(
-            db_url,
-            pool_recycle=3600,  # 连接回收时间
-            pool_pre_ping=True,  # 执行前检查连接是否有效
-            pool_size=300,  # 连接池大小
-            max_overflow=50,  # 最大溢出连接数
-            echo= ConfigContainer.get_config(FullConfig).sqlinfo.sqllog,  # 是否输出SQL日志
-            json_serializer=lambda obj: json.dumps(obj, ensure_ascii=False)
-        )
+        configs = ConfigContainer.get_config(FullConfig).db_configs
+        #根据dbname筛选出配置
+        if not configs:
+            raise ValueError("db_configs should provider")
+        config = next(filter(lambda x: x.database == db_name, configs), None)
+        db_engine = DatabaseManager.get_engine(provider, db_name, config)
         zvt_context.db_engine_map[engine_key] = db_engine
-
-        # 确保数据库存在
-        try:
-            with db_engine.connect() as conn:
-                conn.execute(text("SELECT 1"))
-        except Exception as e:
-            if "Unknown database" in str(e):
-                # 自动创建数据库
-                mysql_config = (mysqlconfig().builder()
-                                .with_host(dbConfig["host"])
-                                .with_port(dbConfig["port"])
-                                .with_credentials(dbConfig["user"], dbConfig["password"])
-                                .with_database("mysql")
-                                .build())
-                db_url = mysql_config.get_connection_url()
-                # 自动创建数据库
-                # admin_url = (
-                #     f"mysql+pymysql://{mysql_config['user']}:{mysql_config['password']}@"
-                #     f"{mysql_config['host']}:{mysql_config['port']}/mysql"
-                # )
-                admin_engine = create_engine(db_url)
-                with admin_engine.connect() as conn:
-                    conn.execute(
-                        text(f"CREATE DATABASE IF NOT EXISTS {db_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"))
-                admin_engine.dispose()
     return db_engine
+
 
 
 def get_providers() -> List[str]:
