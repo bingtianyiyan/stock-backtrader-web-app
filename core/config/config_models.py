@@ -89,11 +89,6 @@ class JQDataConfig(BaseModel):
     )
 
 class SqlInfo(BaseModel):
-    """日志配置"""
-    sqllog: bool = Field(
-        False,
-        description="是否启用SQL日志"
-    )
     initTable: bool = Field(
         False,
         description="是否启用生成表"

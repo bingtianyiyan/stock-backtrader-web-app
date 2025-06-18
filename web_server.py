@@ -3,7 +3,6 @@ import uvicorn
 from fastapi.openapi.docs import get_swagger_ui_html
 
 #import 顺序注册
-import core.inialize.pre_init
 # import core.inialize.after_init
 
 from fastapi import FastAPI
@@ -11,11 +10,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from fastapi_pagination import add_pagination
 
-from core.rest.data import data_router
-from core.rest.factor import factor_router
-from core.rest.misc import misc_router
-from core.rest.trading import trading_router
-from core.rest.work import work_router
+from internal.router.data import data_router
+from internal.router.factor import factor_router
+from internal.router.misc import misc_router
+from internal.router.trading import trading_router
+from internal.router.work import work_router
 
 
 app = FastAPI(title="My API",

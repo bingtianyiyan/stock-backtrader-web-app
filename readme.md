@@ -4,8 +4,6 @@
 
 这是一个基于Python的股票回测Web应用，集成了多个强大的开源库，为量化交易研究提供了一站式解决方案。通过直观的界面，用户可以获取市场数据、执行策略回测并可视化分析结果。
 
-![demo](demo.gif)
-
 ### 核心特性
 
 - **数据获取** - 通过AkShare实时获取A股市场数据
@@ -21,9 +19,27 @@
 | **AkShare**    | 获取金融市场数据    | [官方仓库](https://github.com/akfamily/akshare) |
 | **Backtrader** | 执行量化交易策略回测  | [官方仓库](https://github.com/mementum/backtrader) |
 | **Pyecharts**  | 生成专业金融数据图表  | [官方仓库](https://github.com/pyecharts/pyecharts) |
-| **logus**      | 日志组件        | [官方仓库]() |
+### 项目分层
+web: streamlit相关页面
+internal: 放置业务相关逻辑
+          service:业务逻辑
+          rep：仓储
+          router:fastapi数据接口api和router
+          domain：中间层模型
+          pkg：中间层组件放置的地方
+core: 相关协议和类库
+          inialize:初始化配置文件逻辑
+          contract:协议相关
+          domain:协议落库的数据模型
+          config:配置文件实体相关
+          db:管理数据库相关
+          factors:策略放置的地方
+          pkg：组件封装放置的地方
+          recorders:数据获取的接口实现
+config: 配置文件
 
 ## 快速开始
+
 
 ### 环境准备
 
@@ -38,16 +54,11 @@ pip install -r requirements.txt
 执行以下命令启动Web界面：
 
 ```bash
-streamlit run backtrader_app.py
+streamlit run main.py
 ```
-
+###
+本地调式直接启动 debug_streamlit.py
 ### 策略测试
-
-运行内置策略的单元测试：
-
-```bash
-python -m unittest tests.MaStrategyTest
-```
 
 ## 支持的策略
 
@@ -79,6 +90,3 @@ python -m unittest tests.MaStrategyTest
 | **stake** | 每次交易股数 |
 
 ## 相关推荐
-
-- [**FinVizAI**](https://github.com/chenwr727/FinVizAI.git) - 一键生成股票与期货分析视频
-- [**akshare-gpt**](https://github.com/chenwr727/akshare-gpt.git) - 将AkShare集成到GPT中实现自然语言金融数据查询
