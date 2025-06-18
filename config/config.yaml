@@ -2,20 +2,37 @@ app:
   debug: true
   env: dev
 db_configs:
+#  - db_type: "mysql"
+#    db_action: "mainConn"
+#    host: "127.0.0.1"
+#    port: 3306
+#    username: "root"
+#    password: "root"
+#    database: "tiny_zvt_stock"
+#    extra:
+#      echo: true
+#      pool_size: 20
+#      charset: "utf8mb4"
+#      max_overflow: 20
+#      pool_recycle: 1800
+#    mysql_config:
+#      ssl_mode: "disabled"
+
   - db_type: "postgresql"
     db_action: "mainConn"
-    host: "127.0.0.1"
+    host: "121.196.220.148"
     port: 12390
     username: "root"
     password: "root123"
     database: "tiny_zvt_stock"
     extra:
+      echo: true
       pool_size: 20
       charset: "utf8mb4"
       max_overflow: 20
       pool_recycle: 1800
-#    mysql_config:
-#      ssl_mode: "disabled"
+    mysql_config:
+      ssl_mode: "disabled"
     pg_config:
       schema: "public"
      # sslmode: "require"
@@ -47,23 +64,6 @@ db_configs:
 #      sslmode: "require"
 
 
-#mainConn:
-#  host: "127.0.0.1"
-#  port: 3306
-#  username: "root"
-#  password: "root"
-#  extra:
-#    pool_size: 20
-#    charset: "utf8mb4"
-#jobConn:
-#  host: "127.0.0.1"
-#  port: 3306
-#  username: "root"
-#  password: "root"
-#  database: "zvt_jobs"
-#  extra:
-#    pool_size: 20
-#    charset: "utf8mb4"
 logger:
   driver: loguru
   level: debug
@@ -84,7 +84,7 @@ logger:
 
 sqlinfo:
   sqllog: false
-  initTable: true
+  initTable: false
 jqdata:
   jq_username: ""
   jq_password: ""

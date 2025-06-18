@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-import core.inialize.pre_init
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from core.api.selector import get_entity_ids_by_filter

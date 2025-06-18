@@ -1,11 +1,10 @@
 import streamlit as st
 
-from frames import page_config
+from internal.pkg.frames import page_config
 
 import asyncio
 import nest_asyncio
 #import 顺序注册
-import core.inialize.pre_init
 from web.menu import set_menu
 
 nest_asyncio.apply()

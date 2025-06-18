@@ -3,11 +3,11 @@ import datetime
 import streamlit as st
 import re
 from datetime import datetime, timedelta
-from service.akshareservice import get_stock_name
-from service.etfservice import get_etf_data, get_zh_history
-from strategy.rotation import calculate_technical_indicators, calculate_performance_metrics, backtest_strategy, \
+from internal.service.akshareservice import get_stock_name
+from internal.service.etfservice import get_etf_data, get_zh_history
+from internal.pkg.strategy.rotation import calculate_technical_indicators, calculate_performance_metrics, backtest_strategy, \
     select_stocks, display_results
-from utils.streamlit_utils import download_csv_button, color_negative_red
+from core.utils.streamlit_utils import download_csv_button, color_negative_red
 
 
 

@@ -4,9 +4,9 @@ import streamlit as st
 import akshare as ak
 import pandas as pd
 
-from models.schemas import Stock
-from service.akshareservice import get_stock_name
-from strategy.rsi import backtest_rsi_strategy, plot_results
+from internal.domain.schemas import Stock
+from internal.service.akshareservice import get_stock_name
+from internal.pkg.strategy.rsi import backtest_rsi_strategy, plot_results
 
 # 页面内容
 def show_stock_page():

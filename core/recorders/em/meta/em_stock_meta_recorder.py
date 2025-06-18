@@ -9,7 +9,7 @@ from core.domain import Stock
 from core.recorders.em import em_api
 from core.utils.pd_utils import pd_is_not_null
 
-
+#Stock股票数据
 class EMStockRecorder(Recorder):
     provider = "em"
     data_schema = Stock

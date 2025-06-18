@@ -7,7 +7,7 @@ import pandas as pd
 import streamlit as st
 from loguru import logger
 
-from models.schemas import AkshareParams, StrategyBase, BacktraderParams
+from internal.domain.schemas import AkshareParams, StrategyBase, BacktraderParams
 
 logging.getLogger("streamlit.runtime.scriptrunner_utils").setLevel(logging.ERROR)
 

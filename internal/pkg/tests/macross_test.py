@@ -1,4 +1,4 @@
-from strategy import MaCrossStrategy
+from internal.pkg.strategy import MaCrossStrategy
 
 from .base_test import StrategyTest, run_back_trader
 

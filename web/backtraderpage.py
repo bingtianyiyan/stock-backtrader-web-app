@@ -1,15 +1,16 @@
 import datetime
+import logging
 
-from service.backtraderservice import gen_stock_df, run_backtrader
-from utils.load import load_strategy
-from models.schemas import AkshareParams, BacktraderParams
+from internal.pkg.frames import params_selector_ui
+from internal.service.backtraderservice import gen_stock_df, run_backtrader
+from core.utils.load import load_strategy
+from internal.domain.schemas import AkshareParams, BacktraderParams
 import streamlit as st
 from streamlit_echarts import st_pyecharts
 
-from charts import draw_pro_kline, draw_result_bar
-from utils.logs import logger
-from models.schemas import StrategyBase
-
+from internal.pkg.charts import draw_pro_kline, draw_result_bar
+from internal.domain.schemas import StrategyBase
+logger = logging.getLogger(__name__)
 strategy_dict = load_strategy("./config/strategy.yaml")
 
 def stockAnalysis():

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import core.inialize.pre_init
 from core.domain import Block, BlockStock, Stock
 from core.tag.tag_service import build_default_main_tag, build_default_sub_tags
 from core.tag.tag_utils import (

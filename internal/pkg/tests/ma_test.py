@@ -1,4 +1,4 @@
-from strategy import MaStrategy
+from internal.pkg.strategy import MaStrategy
 
 from .base_test import StrategyTest, run_back_trader
 

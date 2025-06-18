@@ -1,9 +1,9 @@
 import streamlit as st
 
-from frames.sidebar import dynamic_multi_level_menu
+from internal.pkg.frames.sidebar import dynamic_multi_level_menu
 from web.backtraderpage import stockAnalysis
-from web.etfpage import show_etf_page, show_etf_list, show_rotation_strategy_page
-from web.stockpage import show_stock_page, show_rsi_page
+from web.etfpage import show_etf_list, show_rotation_strategy_page
+from web.stockpage import show_rsi_page
 
 
 #设置菜单
