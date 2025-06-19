@@ -167,13 +167,16 @@ class SchedulerManager:
         if len(fields) == 5:
             return CronTrigger.from_crontab(cron_expr, timezone=timezone)
         elif len(fields) == 6:
+            # 处理 day_of_week="?" 的情况（APScheduler 不支持，需替换为 "*"）
+            day_of_week = "*" if fields[5] == "?" else fields[5]
+
             return CronTrigger(
                 second=fields[0],
                 minute=fields[1],
                 hour=fields[2],
                 day=fields[3],
                 month=fields[4],
-                day_of_week=fields[5],
+                day_of_week=day_of_week,  # 替换 "?" 为 "*"
                 timezone=timezone,
                 start_date=start_time,
                 end_date=end_time

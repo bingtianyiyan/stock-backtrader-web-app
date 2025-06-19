@@ -25,7 +25,7 @@ if __name__ == "__main__":
         # 添加Cron任务
         manager.add_cron_task(
             func=midnight_task,
-            cron_expr="*/5 * * * *",  # 5秒
+            cron_expr="*/5 * * * * *",  # 5秒
             job_id="midnight_task"
         )
 

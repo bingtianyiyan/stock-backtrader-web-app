@@ -17,18 +17,6 @@ db_configs:
     mysql_config:
       ssl_mode: "disabled"
 
-  - db_type: "mysql"
-    db_action: "jobConn"
-    host: "127.0.0.1"
-    port: 3306
-    username: "root"
-    password: "root"
-    database: "zvt_jobs"
-    extra:
-      pool_size: 20
-      charset: "utf8mb4"
-      max_overflow: 20
-      pool_recycle: 1800
 
 #  - db_type: "postgresql"
 #    db_action: "analytics"
@@ -44,23 +32,11 @@ db_configs:
 #      sslmode: "require"
 
 
-#mainConn:
-#  host: "127.0.0.1"
-#  port: 3306
-#  username: "root"
-#  password: "root"
-#  extra:
-#    pool_size: 20
-#    charset: "utf8mb4"
-#jobConn:
-#  host: "127.0.0.1"
-#  port: 3306
-#  username: "root"
-#  password: "root"
-#  database: "zvt_jobs"
-#  extra:
-#    pool_size: 20
-#    charset: "utf8mb4"
+scheduler_config:
+   jobstore_type: 'mysql'
+   database_url: 'mysql+pymysql://root:root@localhost/tinyjobs'
+   max_workers: 10
+
 logger:
   driver: loguru
   level: debug

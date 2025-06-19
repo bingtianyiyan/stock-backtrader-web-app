@@ -17,21 +17,22 @@ async def async_task():
 def midnight_task():
     logger.info("Midnight task")
 
-with SchedulerManager(ConfigContainer.get_config(FullConfig).scheduler_config) as scheduler_manager:
+scheduler_manager = SchedulerManager(ConfigContainer.get_config(FullConfig).scheduler_config)
+#with SchedulerManager(ConfigContainer.get_config(FullConfig).scheduler_config) as scheduler_manager:
 
     # 添加Cron任务
-    scheduler_manager.add_cron_task(
+scheduler_manager.add_cron_task(
         func= midnight_task,
-        cron_expr="*/5 * * * *",  # 5秒
+        cron_expr="*/5 * * * * *",  # 5秒
         job_id="midnight_task2"
     )
-
-    scheduler_manager.add_cron_task(
+logger.info("add midnight_task2")
+scheduler_manager.add_cron_task(
         func= midnight_task,
-        cron_expr="*/5 * * * *",  # 5秒
+        cron_expr="*/5 * * * * *",  # 5秒
         job_id="midnight_task3"
     )
-
+logger.info("add midnight_task3")
     # scheduler_manager.add_cron_task(
     #     func=calculate_top,
     #     cron_expr="*/60 * * * *",
