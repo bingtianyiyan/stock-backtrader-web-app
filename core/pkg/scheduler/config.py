@@ -77,3 +77,13 @@ class SchedulerConfig(BaseModel):
         return {
             'default': executor_class(max_workers=self.max_workers)
         }
+
+    # @property
+    # def executors(self):
+    #     return {
+    #         'default': {
+    #             'type': 'asyncio',  # 使用异步执行器
+    #             # 或者明确指定类
+    #             # 'class': 'apscheduler.executors.asyncio:AsyncIOExecutor'
+    #         }
+    #     }

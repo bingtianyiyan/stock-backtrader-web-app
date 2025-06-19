@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-from apscheduler.schedulers.background import BackgroundScheduler
 
 from core.api.selector import get_entity_ids_by_filter
 from core.config.configmanager import  ConfigContainer
@@ -26,7 +25,7 @@ from core.utils.time_utils import current_date
 
 logger = logging.getLogger(__name__)
 
-sched = BackgroundScheduler()
+# sched = BackgroundScheduler()
 
 email_informer = EmailInformer()
 
@@ -127,7 +126,12 @@ def record_data_and_build_stock_pools():
 
 if __name__ == "__main__":
     #init_log("sotck_pool_runner.log")
-    record_data_and_build_stock_pools()
-    sched.add_job(func=record_data_and_build_stock_pools, trigger="cron", hour=16, minute=00, day_of_week="mon-fri")
-    sched.start()
-    sched._thread.join()
+     record_data_and_build_stock_pools()
+    # sched.add_job(func=record_data_and_build_stock_pools, trigger="cron", hour=16, minute=00, day_of_week="mon-fri")
+    # sched.start()
+    # sched._thread.join()
+    # scheduler_manager.add_cron_task(
+    #         func=record_data_and_build_stock_pools(),
+    #         cron_expr="0 16 * * 1-5",
+    #         job_id="stock_pool_task"
+    #     )

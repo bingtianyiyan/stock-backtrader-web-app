@@ -3,7 +3,6 @@ import logging
 import time
 from typing import List
 import eastmoneypy
-from apscheduler.schedulers.background import BackgroundScheduler
 
 from core.api.selector import get_top_up_today, get_top_vol, get_top_down_today
 from core.domain import Stock
@@ -17,10 +16,10 @@ from core.utils.time_utils import now_pd_timestamp, current_date
 logger = logging.getLogger(__name__)
 
 
-sched = BackgroundScheduler()
+# sched = BackgroundScheduler()
+#
 
-
-def calculate_top(clear_em=True):
+def calculate_top(clear_em=False):
     if clear_em:
         try:
             eastmoneypy.del_group("今日强势")
@@ -95,6 +94,16 @@ def calculate_top(clear_em=True):
 if __name__ == "__main__":
     #init_log("today_top_runner.log")
     calculate_top(clear_em=False)
-    sched.add_job(func=calculate_top, trigger="cron", hour=9, minute=26, day_of_week="mon-fri")
-    sched.start()
-    sched._thread.join()
+    # sched.add_job(func=calculate_top, trigger="cron", hour=9, minute=26, day_of_week="mon-fri")
+    # sched.start()
+    # sched._thread.join()
+    # scheduler_manager.add_cron_task(
+    #         func=calculate_top(clear_em=False),
+    #         cron_expr="*/60 * * * *",
+    #         job_id="today_top_task_test"
+    #     )
+    # scheduler_manager.add_cron_task(
+    #         func=calculate_top(clear_em=False),
+    #         cron_expr="26 9 * * 1-5",
+    #         job_id="today_top_task"
+    #     )

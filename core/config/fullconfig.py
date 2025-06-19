@@ -3,6 +3,7 @@ from pydantic import BaseModel, validator, Field
 
 from core.config.config_models import JQDataConfig, ProxyConfig, EmailConfig, WeChatConfig, QMTConfig, AIConfig, SqlInfo
 from core.pkg.logger.config import LoggerConfig
+from core.pkg.scheduler.config import SchedulerConfig
 
 # 泛型类型，用于扩展不同模块的配置
 T = TypeVar('T')
@@ -51,6 +52,7 @@ class FullConfig(BaseModel):
     app: AppConfig
     db_configs: List[DatabaseConfig] = Field(..., description="数据库配置列表")
     logger: LoggerConfig
+    scheduler_config: SchedulerConfig
     """聚合所有配置的顶级模型"""
     jqdata: JQDataConfig = Field(default_factory=JQDataConfig)
     proxy: ProxyConfig = Field(default_factory=ProxyConfig)

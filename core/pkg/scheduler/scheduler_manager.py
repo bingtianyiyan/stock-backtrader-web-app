@@ -1,3 +1,5 @@
+import asyncio
+import functools
 import logging
 from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Literal
@@ -152,6 +154,33 @@ class SchedulerManager:
         scheduler.add_listener(job_event_listener,
                                EVENT_JOB_ADDED | EVENT_JOB_EXECUTED | EVENT_JOB_ERROR | EVENT_JOB_MISSED)
 
+    def create_cron_trigger(
+            self,
+            cron_expr: str,
+            timezone,
+            start_time=None,
+            end_time=None
+    ):
+        """创建Cron触发器（兼容5字段和6字段表达式）"""
+        fields = cron_expr.strip().split()
+
+        if len(fields) == 5:
+            return CronTrigger.from_crontab(cron_expr, timezone=timezone)
+        elif len(fields) == 6:
+            return CronTrigger(
+                second=fields[0],
+                minute=fields[1],
+                hour=fields[2],
+                day=fields[3],
+                month=fields[4],
+                day_of_week=fields[5],
+                timezone=timezone,
+                start_date=start_time,
+                end_date=end_time
+            )
+        else:
+            raise ValueError(f"无效的Cron表达式字段数: 得到 {len(fields)} 个字段，需要5或6个字段")
+
     def add_interval_task(
             self,
             func: Callable,
@@ -217,9 +246,11 @@ class SchedulerManager:
         """
         try:
             # 创建trigger时不带start_date/end_date
-            trigger = CronTrigger.from_crontab(
-                cron_expr,
-                timezone=self.config.timezone
+            trigger = self.create_cron_trigger(
+                cron_expr=cron_expr,  # 确保使用关键字参数
+                timezone=self.config.timezone,
+                start_time=start_time,
+                end_time=end_time
             )
 
             # 在add_job时设置start_date/end_date
@@ -365,6 +396,19 @@ class SchedulerManager:
 
         return wrapper
 
+    # 包装器（确保协程被正确执行）
+    def sync_wrapper(self,coro_func):
+        @functools.wraps(coro_func)
+        def wrapper(*args, **kwargs):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                return loop.run_until_complete(coro_func(*args, **kwargs))
+            finally:
+                loop.close()
+
+        return wrapper
+
     def __enter__(self):
         return self
 
@@ -375,3 +419,7 @@ class SchedulerManager:
                 "Context manager exited with error",
                 exc_info=(exc_type, exc_val, exc_tb)
             )
+
+
+
+

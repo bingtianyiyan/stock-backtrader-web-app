@@ -34,4 +34,5 @@ if __name__ == "__main__":
 
         # 保持运行
         import time
-        time.sleep(60)
+        while True:
+         time.sleep(1)
