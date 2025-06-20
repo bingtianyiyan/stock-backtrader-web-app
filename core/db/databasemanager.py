@@ -1,5 +1,6 @@
 from typing import Optional, Union
-from sqlalchemy import create_engine, Engine, text, URL
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import Engine, URL
 from sqlalchemy.exc import OperationalError, ProgrammingError
 import json
 import logging

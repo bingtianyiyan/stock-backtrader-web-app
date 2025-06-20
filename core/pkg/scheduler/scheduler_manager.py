@@ -43,6 +43,7 @@ class SchedulerManager:
         self.config = config
         self.logger = self._setup_logger()
         self._scheduler = self._init_scheduler()
+        self._setup()
 
     def _setup_logger(self) -> logging.Logger:
         """配置专用日志器"""
@@ -99,6 +100,23 @@ class SchedulerManager:
         except Exception as e:
             self.logger.critical(f"Scheduler initialization failed: {str(e)}", exc_info=True)
             raise RuntimeError(f"Scheduler init failed: {str(e)}") from e
+
+    def _setup(self):
+        # 启动时清理
+        self.clean_dead_jobs()
+
+        # 定时清理（每12小时）
+        self.add_interval_task(
+            func=self.clean_dead_jobs,
+            interval=3600*12,  # 12小时秒间隔
+            job_id="auto_cleaner"
+        )
+
+        # 事件监听
+        self._scheduler.add_listener(
+            self._error_handler,
+            EVENT_JOB_ERROR
+        )
 
     def _create_jobstore(self):
         """创建作业存储"""
@@ -364,6 +382,19 @@ class SchedulerManager:
         except Exception as e:
             self.logger.error(f"Failed to modify task [{job_id}]: {str(e)}")
             return False
+
+    def clean_dead_jobs(self):
+        # 自动清理无效 Job
+        try:
+            for job in self._scheduler.get_jobs():
+                if not hasattr(job.func, '__call__'):
+                    self._scheduler.remove_job(job.id)
+        except Exception as e:
+             self.logger.error(f"Failed to clean_dead_jobs: {str(e)}")
+
+    def _error_handler(self, event):
+        """错误时自动清理"""
+        self._scheduler.remove_job(event.job_id)
 
     def shutdown(self, wait: bool = True) -> None:
         """关闭调度器"""

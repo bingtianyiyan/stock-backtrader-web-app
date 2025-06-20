@@ -5,7 +5,7 @@ import platform
 from typing import List, Union, Type
 
 import pandas as pd
-from sqlalchemy import create_engine, bindparam
+from sqlalchemy import create_engine, bindparam, TextClause
 from sqlalchemy import func, exists, and_
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -20,7 +20,7 @@ from core.contract.schema import Mixin, TradableEntity
 from core.db.databasemanager import DatabaseManager
 from core.utils.pd_utils import pd_is_not_null, index_df
 from core.utils.time_utils import to_pd_timestamp
-from sqlalchemy.sql import text  # 添加这行导入
+from sqlalchemy.sql import text, Select  # 添加这行导入
 
 logger = logging.getLogger(__name__)
 
@@ -403,14 +403,22 @@ def get_data(
 def safe_read_sql(query, session):
     """安全执行SQLAlchemy查询的封装"""
     try:
+        # 情况1：直接传入 SQL 字符串
+        if isinstance(query, str):
+            return pd.read_sql_query(query, session.bind)
+
+        # 情况2：传入 SQLAlchemy 的 `Select` 或 `TextClause` 对象
+        elif isinstance(query, (Select, TextClause)):
+            return pd.read_sql_query(query, session.bind)
+
         # 方法1：优先尝试直接读取
         if hasattr(query, 'statement'):
             return pd.read_sql_query(query.statement, session.bind)
 
-        # 方法2：降级处理
-        from sqlalchemy import text
-        if isinstance(query, (str, text)):
-            return pd.read_sql(query, session.bind)
+        # # 方法2：降级处理
+        # from sqlalchemy import text
+        # if isinstance(query, (str, text)):
+        #     return pd.read_sql(query, session.bind)
 
         # 方法3：最终回退
         result = session.execute(query)
