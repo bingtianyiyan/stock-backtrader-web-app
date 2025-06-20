@@ -19,14 +19,14 @@ scheduler_manager = SchedulerManager(ConfigContainer.get_config(FullConfig).sche
 
 def register_all_tasks():
         # 添加Cron任务
+    # scheduler_manager.add_cron_task(
+    #         func= midnight_task,
+    #         cron_expr="*/5 * * * * *",  # 5秒
+    #         job_id="midnight_task2"
+    #     )
+    # logger.info("midnight_task")
     scheduler_manager.add_cron_task(
-            func= midnight_task,
-            cron_expr="*/5 * * * * *",  # 5秒
-            job_id="midnight_task2"
-        )
-    logger.info("midnight_task")
-    scheduler_manager.add_cron_task(
-            func=calculate_top(False),
+            func=calculate_top,
             cron_expr="*/15 * * * * *",
             job_id="today_top_task_test"
         )
@@ -43,5 +43,18 @@ def register_all_tasks():
         )
     logger.info("register finish")
 
+
 register_all_tasks()
+scheduler_manager.setup()
 logger.info("register register_all_tasks")
+scheduler_manager.start()
+
+if __name__ == "__main__":
+    register_all_tasks()
+    scheduler_manager.setup()
+    scheduler_manager.start()
+    # 保持运行
+    import time
+
+    while True:
+        time.sleep(1)

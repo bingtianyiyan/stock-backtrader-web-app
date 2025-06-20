@@ -43,7 +43,7 @@ class SchedulerManager:
         self.config = config
         self.logger = self._setup_logger()
         self._scheduler = self._init_scheduler()
-        self._setup()
+        #self._setup()
 
     def _setup_logger(self) -> logging.Logger:
         """配置专用日志器"""
@@ -90,18 +90,20 @@ class SchedulerManager:
             # 添加事件监听
             self._add_event_listeners(scheduler)
 
-            scheduler.start()
-            self.logger.info(
-                f"Scheduler started with {self.config.jobstore_type} storage "
-                f"and {self.config.exec_type} executor"
-            )
             return scheduler
 
         except Exception as e:
             self.logger.critical(f"Scheduler initialization failed: {str(e)}", exc_info=True)
             raise RuntimeError(f"Scheduler init failed: {str(e)}") from e
 
-    def _setup(self):
+    def start(self):
+        self._scheduler.start()
+        self.logger.info(
+            f"Scheduler started with {self.config.jobstore_type} storage "
+            f"and {self.config.exec_type} executor"
+        )
+
+    def setup(self):
         # 启动时清理
         self.clean_dead_jobs()
 
