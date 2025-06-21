@@ -1,7 +1,11 @@
 import streamlit as st
 
 from internal.pkg.frames import page_config
-
+from internal.router.data import data_router
+from internal.router.factor import factor_router
+from internal.router.misc import misc_router
+from internal.router.trading import trading_router
+from internal.router.work import work_router
 import asyncio
 import nest_asyncio
 #import 顺序注册

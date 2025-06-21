@@ -3,7 +3,7 @@ import streamlit as st
 from internal.pkg.frames.sidebar import dynamic_multi_level_menu
 from web.backtraderpage import stockAnalysis
 from web.etfpage import show_etf_list, show_rotation_strategy_page
-from web.stockpage import show_rsi_page
+from web.stockpage import show_rsi_page, show_trader_page
 
 
 #设置菜单
@@ -16,7 +16,7 @@ def set_menu():
     submenus = {
         "首页":None,
         "ETF数据": ["数据概览", "回测分析"],
-        "Stock数据": ["数据概览", "回测分析"],
+        "Stock数据": ["股票交易", "回测分析"],
         "回测分析": None
     }
     submenu_icons = {
@@ -71,12 +71,11 @@ def etf_page(selected_secondary,menu_options,submenus):
         show_rotation_strategy_page()
 
 def stock_page(selected_secondary,menu_options,submenus):
-    if selected_secondary == submenus[menu_options[1]][0]:
-        st.write("这里是内容...")
+    if selected_secondary == submenus[menu_options[2]][0]:
+        show_trader_page()
     elif selected_secondary == submenus[menu_options[2]][1]:
         show_rsi_page()
-    #st.title("📈 Stock数据")
-    #show_stock_page()
+
 
 def back_trader_page():
     st.title("📈 回测数据")

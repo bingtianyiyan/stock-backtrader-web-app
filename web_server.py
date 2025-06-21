@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+import atexit
+import signal
+import subprocess
+from typing import Optional
+
 import uvicorn
 from fastapi.openapi.docs import get_swagger_ui_html
 
@@ -55,6 +60,42 @@ app.include_router(trading_router)
 app.include_router(misc_router)
 
 add_pagination(app)
+
+#streamlit
+streamlit_process: Optional[subprocess.Popen] = None
+
+def start_streamlit():
+    """启动Streamlit子进程"""
+    global streamlit_process
+    if streamlit_process is None:
+        streamlit_process = subprocess.Popen(
+            ["streamlit", "run", "main.py", "--server.port=8501"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        atexit.register(stop_streamlit)  # 注册退出清理
+
+def stop_streamlit():
+    """停止Streamlit子进程"""
+    global streamlit_process
+    if streamlit_process:
+        streamlit_process.send_signal(signal.SIGINT)  # 优雅终止
+        streamlit_process.wait(timeout=5)
+        streamlit_process = None
+
+@app.on_event("startup")
+async def startup():
+    start_streamlit()
+
+@app.on_event("shutdown")
+async def shutdown():
+    stop_streamlit()
+
+@app.get("/streamlit/restart")
+async def restart_streamlit():
+    stop_streamlit()
+    start_streamlit()
+    return {"status": "restarted"}
 
 def main():
     log_config = "config/log_conf.yaml"

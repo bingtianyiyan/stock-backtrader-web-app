@@ -43,7 +43,7 @@ class SchedulerManager:
         self.config = config
         self.logger = self._setup_logger()
         self._scheduler = self._init_scheduler()
-        #self._setup()
+        self._setup()
 
     def _setup_logger(self) -> logging.Logger:
         """配置专用日志器"""
@@ -103,7 +103,7 @@ class SchedulerManager:
             f"and {self.config.exec_type} executor"
         )
 
-    def setup(self):
+    def _setup(self):
         # 启动时清理
         self.clean_dead_jobs()
 

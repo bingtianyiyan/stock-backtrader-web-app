@@ -27,8 +27,8 @@ def register_all_tasks():
     # logger.info("midnight_task")
     scheduler_manager.add_cron_task(
             func=calculate_top,
-            cron_expr="*/15 * * * * *",
-            job_id="today_top_task_test"
+            cron_expr="26 9 * * 1-5",
+            job_id="today_top_task"
         )
     logger.info("register calculate_top")
     scheduler_manager.add_cron_task(
@@ -42,19 +42,15 @@ def register_all_tasks():
             job_id="stock_pool_task"
         )
     logger.info("register finish")
+    scheduler_manager.start()
 
-
-register_all_tasks()
-scheduler_manager.setup()
-logger.info("register register_all_tasks")
-scheduler_manager.start()
 
 if __name__ == "__main__":
     register_all_tasks()
-    scheduler_manager.setup()
-    scheduler_manager.start()
     # 保持运行
     import time
 
     while True:
         time.sleep(1)
+
+__all__ = ["register_all_tasks"]
