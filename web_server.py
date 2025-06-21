@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import atexit
-import signal
+import multiprocessing
+import os
 import subprocess
 from typing import Optional
 
@@ -14,18 +14,29 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from fastapi_pagination import add_pagination
+from starlette.staticfiles import StaticFiles
 
 from internal.router.data import data_router
 from internal.router.factor import factor_router
 from internal.router.misc import misc_router
 from internal.router.trading import trading_router
 from internal.router.work import work_router
+# from internal.tasks.add_scheduler_runner import run_calculate_top_task
+# from contextlib import asynccontextmanager
+#
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     run_calculate_top_task()
+#     yield
 
-
-app = FastAPI(title="My API",
+app = FastAPI(
+    title="My API",
     version="1.0.0",
     openapi_version="3.0.2",  # 明确指定 OpenAPI 版本
-    docs_url="/docs",default_response_class=ORJSONResponse)
+    docs_url=None,default_response_class=ORJSONResponse)
+
+# 挂载静态文件（必须放在路由前面）
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 origins = ["*"]
 
@@ -43,8 +54,9 @@ async def custom_swagger_ui_html():
     return get_swagger_ui_html(
         openapi_url="/openapi.json",
         title="API Docs",
-        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
-        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
+        swagger_js_url="/static/swagger-ui-bundle.min.js",
+        swagger_css_url="/static/swagger-ui.css",
+        swagger_favicon_url="/static/swagger-ui/favicon-32x32.png",
     )
 
 
@@ -64,42 +76,17 @@ add_pagination(app)
 #streamlit
 streamlit_process: Optional[subprocess.Popen] = None
 
-def start_streamlit():
-    """启动Streamlit子进程"""
-    global streamlit_process
-    if streamlit_process is None:
-        streamlit_process = subprocess.Popen(
-            ["streamlit", "run", "main.py", "--server.port=8501"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-        atexit.register(stop_streamlit)  # 注册退出清理
-
-def stop_streamlit():
-    """停止Streamlit子进程"""
-    global streamlit_process
-    if streamlit_process:
-        streamlit_process.send_signal(signal.SIGINT)  # 优雅终止
-        streamlit_process.wait(timeout=5)
-        streamlit_process = None
-
-@app.on_event("startup")
-async def startup():
-    start_streamlit()
-
-@app.on_event("shutdown")
-async def shutdown():
-    stop_streamlit()
-
-@app.get("/streamlit/restart")
-async def restart_streamlit():
-    stop_streamlit()
-    start_streamlit()
-    return {"status": "restarted"}
+def run_streamlit():
+    os.system("streamlit run main.py --server.port=8502")
 
 def main():
+    # 启动 Streamlit 进程
+    p = multiprocessing.Process(target=run_streamlit)
+    p.start()
     log_config = "config/log_conf.yaml"
     uvicorn.run("web_server:app", host="0.0.0.0", reload=True, port=8090, log_config=log_config)
+    # 确保进程在退出时被终止
+    p.join()
 
 
 if __name__ == "__main__":
