@@ -9,7 +9,7 @@ class Level(Enum):
     ERROR = "error"
     FATAL = "fatal"
 
-def get_level(level_str: str) -> int:
+def get_level(level_str: str) -> str:
     level_mapping = {
         "debug": logging.DEBUG,
         "info": logging.INFO,
@@ -17,4 +17,5 @@ def get_level(level_str: str) -> int:
         "error": logging.ERROR,
         "fatal": logging.CRITICAL
     }
-    return level_mapping.get(level_str.lower(), logging.WARNING)
+    levelId = level_mapping.get(level_str.lower(), logging.WARNING)
+    return logging.getLevelName(levelId)

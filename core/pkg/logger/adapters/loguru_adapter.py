@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional, TypeVar
 
 from ..handlerbridge.loguru_handler import setup_compatible_logging
+from ..level import get_level
 
 # 在模块顶部定义默认格式
 DEFAULT_FORMAT = (
@@ -36,15 +37,17 @@ class LoguruAdapter(BaseLogger):
     def _setup_handlers(self, config: LoggerConfig):
         """配置日志处理器"""
         logger.remove()  # 清除现有处理器
+        # 转换level
+        levelname = get_level(config.level)
         """配置所有日志处理器"""
         for writer in config.write_to:
             try:
                 if writer.name == 'console':
-                    self._add_console_handler(writer.args, config.level.upper())
+                    self._add_console_handler(writer.args, levelname)
                 elif writer.name == 'file':
                     if not writer.args:
                         raise ValueError("File writer requires 'args' section")
-                    self._add_file_handler(writer.args,config.level.upper())
+                    self._add_file_handler(writer.args,levelname)
             except Exception as e:
                 sys.stderr.write(f"Failed to init {writer.name} writer: {str(e)}\n")
 
