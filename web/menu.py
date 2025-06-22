@@ -4,20 +4,22 @@ from internal.pkg.frames.sidebar import dynamic_multi_level_menu
 from web.backtraderpage import stockAnalysis
 from web.etfpage import show_etf_list, show_rotation_strategy_page
 from web.stockpage import show_rsi_page, show_trader_page
+from web.testpage import testPage
 
 
 #设置菜单
 def set_menu():
     menu_title = "Tiny系统"
     #一级菜单
-    menu_options = ["首页", "ETF数据","Stock数据","回测分析"]
-    menu_icons= ["house", "bar-chart", "bar-chart", "bar-chart"]
+    menu_options = ["首页", "ETF数据","Stock数据","回测分析","测试页面"]
+    menu_icons= ["house", "bar-chart", "bar-chart", "bar-chart", "bar-chart"]
     # 二级菜单映射
     submenus = {
         "首页":None,
         "ETF数据": ["数据概览", "回测分析"],
         "Stock数据": ["股票交易", "回测分析"],
-        "回测分析": None
+        "回测分析": None,
+        "测试页面": None,
     }
     submenu_icons = {
         "ETF数据": ["clipboard-data", "clipboard-data"],
@@ -43,6 +45,8 @@ def set_menu():
          stock_page(selected_secondary,menu_options,submenus)
     elif selected_primary == menu_options[3]:
             back_trader_page()
+    elif selected_primary == menu_options[4]:
+            test_page()
 
 
     # selected = sidebar_navigation(menu_title, menu_options,menu_icons,submenu_icons)
@@ -80,3 +84,7 @@ def stock_page(selected_secondary,menu_options,submenus):
 def back_trader_page():
     st.title("📈 回测数据")
     stockAnalysis()
+
+def test_page():
+    st.title("📈 测试页面")
+    testPage()

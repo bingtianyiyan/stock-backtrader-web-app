@@ -21,13 +21,6 @@ from internal.router.factor import factor_router
 from internal.router.misc import misc_router
 from internal.router.trading import trading_router
 from internal.router.work import work_router
-# from internal.tasks.add_scheduler_runner import run_calculate_top_task
-# from contextlib import asynccontextmanager
-#
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     run_calculate_top_task()
-#     yield
 
 app = FastAPI(
     title="My API",
@@ -73,8 +66,6 @@ app.include_router(misc_router)
 
 add_pagination(app)
 
-#streamlit
-streamlit_process: Optional[subprocess.Popen] = None
 
 def run_streamlit():
     os.system("streamlit run main.py --server.port=8502")
