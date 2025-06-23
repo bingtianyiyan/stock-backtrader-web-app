@@ -10,7 +10,7 @@ db_configs:
     password: "root"
     database: "tiny_zvt_stock"
     extra:
-      echo: true
+      echo: false
       pool_size: 20
       charset: "utf8mb4"
       max_overflow: 20
@@ -52,12 +52,14 @@ db_configs:
 
 scheduler_config:
    jobstore_type: 'mysql'
-   database_url: 'mysql+pymysql://root:root@localhost/tinyjobs'
+   scheduler_type: 'AsyncIOScheduler'
+#   database_url: 'mysql+pymysql://root:root@localhost/tinyjobs'
+   database_url: 'mysql+asyncmy://root:root@localhost/tinyjobs'
    max_workers: 10
 
 logger:
   driver: loguru
-  level: debug
+  level: warn
   write_to:
     - name: console
 #      args:
@@ -74,7 +76,7 @@ logger:
         retention: "30 days"
 
 sqlinfo:
-  initTable: true
+  initTable: false
 jqdata:
   jq_username: ""
   jq_password: ""

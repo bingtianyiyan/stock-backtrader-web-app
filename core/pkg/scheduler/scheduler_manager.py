@@ -4,6 +4,10 @@ import logging
 from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Literal
 from datetime import datetime, timedelta
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.schedulers.base import BaseScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
 from pydantic import BaseModel, Field, validator
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
@@ -19,6 +23,7 @@ from apscheduler.events import (
     EVENT_JOB_MISSED
 )
 
+from core.pkg.scheduler.async_to_sync_db_url import async_to_sync_db_url
 from core.pkg.scheduler.config import SchedulerConfig
 
 logger = logging.getLogger(__name__)
@@ -34,7 +39,7 @@ class SchedulerManager:
     - 健壮的错误处理和日志记录
     """
 
-    def __init__(self, config: SchedulerConfig):
+    def __init__(self, config: SchedulerConfig,scheduler: BaseScheduler = None):
         """
         初始化调度器
         :param config: 调度器配置
@@ -42,7 +47,7 @@ class SchedulerManager:
         """
         self.config = config
         self.logger = self._setup_logger()
-        self._scheduler = self._init_scheduler()
+        self._scheduler = scheduler or self._init_scheduler()
         self._setup()
 
     def _setup_logger(self) -> logging.Logger:
@@ -57,7 +62,7 @@ class SchedulerManager:
         logger.addHandler(handler)
         return logger
 
-    def _init_scheduler(self) -> BackgroundScheduler:
+    def _init_scheduler(self) -> BaseScheduler:
         """初始化调度器实例"""
         try:
             # 准备存储配置
@@ -78,14 +83,28 @@ class SchedulerManager:
             }
             job_defaults.update(self.config.job_defaults)
 
-            # 创建调度器
-            scheduler = BackgroundScheduler(
-                jobstores=jobstores,
-                executors=executors,
-                job_defaults=job_defaults,
-                timezone=self.config.timezone,
-                daemon=False
-            )
+            # 创建调度器 BackgroundScheduler，BlockingScheduler，AsyncIOScheduler
+            if self.config.jobstore_type == "AsyncIOScheduler":
+                scheduler = AsyncIOScheduler(jobstores=jobstores,
+                    executors=executors,
+                    job_defaults=job_defaults,
+                    timezone=self.config.timezone)
+            elif self.config.jobstore_type == "BlockingScheduler":
+                scheduler = BlockingScheduler(
+                    jobstores=jobstores,
+                    executors=executors,
+                    job_defaults=job_defaults,
+                    timezone=self.config.timezone,
+                    daemon=False
+                )
+            else:
+                scheduler = BackgroundScheduler(
+                    jobstores=jobstores,
+                    executors=executors,
+                    job_defaults=job_defaults,
+                    timezone=self.config.timezone,
+                    daemon=False
+                )
 
             # 添加事件监听
             self._add_event_listeners(scheduler)
@@ -132,16 +151,16 @@ class SchedulerManager:
                 'connect_args': {'connect_timeout': 5}
             }
         }
-
+        url = async_to_sync_db_url(self.config.database_url)
         if self.config.jobstore_type == 'sqlite':
             return SQLAlchemyJobStore(
-                url=self.config.database_url,
+                url=url,
                 **common_options
             )
 
         # PostgreSQL/MySQL
         return SQLAlchemyJobStore(
-            url=self.config.database_url,
+            url=url,
             tablename=f'apscheduler_{self.config.jobstore_type}_jobs',
             **common_options
         )
@@ -151,7 +170,6 @@ class SchedulerManager:
         if self.config.exec_type == 'thread':
             return ThreadPoolExecutor(
                 max_workers=self.config.max_workers,
-                #thread_name_prefix='APScheduler'
             )
         return ProcessPoolExecutor(max_workers=self.config.max_workers)
 

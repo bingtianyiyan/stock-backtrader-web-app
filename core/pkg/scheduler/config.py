@@ -18,6 +18,7 @@ class SchedulerConfig(BaseModel):
     :param exec_type: 执行器类型 ('thread' | 'process')
     :param timezone: 时区设置
     :param job_defaults: 任务默认配置
+    :param scheduler_type: 定时器类型BackgroundScheduler，BlockingScheduler，AsyncIOScheduler
     """
     model_config = ConfigDict(arbitrary_types_allowed=True)  # 关键配置
     jobstore_type: Literal['memory', 'sqlite', 'postgresql', 'mysql'] = Field('memory', description="存储后端类型")
@@ -39,6 +40,7 @@ class SchedulerConfig(BaseModel):
         },
         description="任务默认配置"
     )
+    scheduler_type: Optional[str] = Field("BackgroundScheduler")
 
     @validator('timezone', pre=True)
     def validate_timezone(cls, v):
