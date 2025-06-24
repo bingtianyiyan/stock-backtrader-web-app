@@ -1,4 +1,4 @@
-from core.pkg.scheduler.config import SchedulerConfig
+from core.pkg.scheduler.config import SchedulerConfig, DbStoreArgs
 from core.pkg.scheduler.scheduler_manager import SchedulerManager
 
 def midnight_task():
@@ -9,7 +9,7 @@ if __name__ == "__main__":
     # 配置PostgreSQL存储
     config = SchedulerConfig(
         jobstore_type='mysql',
-        database_url='mysql+pymysql://root:root@localhost/tinyjobs',
+        args= DbStoreArgs( database_url= 'mysql+pymysql://root:root@localhost/tinyjobs') ,
         max_workers=10
     )
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
             cron_expr="*/5 * * * * *",  # 5秒
             job_id="midnight_task"
         )
-
+        manager.start()
         # 获取任务信息
         print(manager.get_task_info("print_task"))
 

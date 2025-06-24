@@ -59,6 +59,16 @@ scheduler_config:
    args:
        database_url: 'mysql+asyncmy://root:root@localhost/tinyjobs'
 
+#   jobstore_type: 'redis'
+#   scheduler_type: 'AsyncIOScheduler'
+#   max_workers: 10
+#   args:
+#       host: '127.0.0.1'
+#       port: 6379
+#       db: 0
+#       password:
+#       jobs_key: apscheduler.jobs
+#       run_times_key: apscheduler.run_times
 
 logger:
   driver: loguru

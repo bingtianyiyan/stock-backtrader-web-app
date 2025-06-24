@@ -14,10 +14,14 @@ schedulerManager = SchedulerManager(ConfigContainer.get_config(FullConfig).sched
 
 scheduler = schedulerManager._scheduler
 
-#@scheduler.scheduled_job(id="system_info_task",trigger='interval', seconds=10,max_instances=1,misfire_grace_time=300)
-@scheduler.scheduled_job(id="system_info_task",trigger= 'cron',cron="0 5 * * *")
-def cron_task_system_info():
+@scheduler.scheduled_job(id="mytest_task",trigger='interval', seconds=10,max_instances=1,misfire_grace_time=300)
+def cron_task_test():
     print('cron task is run...')
+    init_tag_system_info()
+
+#@scheduler.scheduled_job(id="system_info_task",trigger='interval', seconds=10,max_instances=1,misfire_grace_time=300)
+@scheduler.scheduled_job(id="system_info_task",trigger= 'cron',minute="0",hour="5",day_of_week="1-5")
+def cron_task_system_info():
     init_tag_system_info()
 
 # @scheduler.scheduled_job(id="mytest_task2",trigger='interval', seconds=10,max_instances=1,misfire_grace_time=300)

@@ -5,6 +5,7 @@ from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Literal
 from datetime import datetime, timedelta
 
+from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.schedulers.base import BaseScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -24,7 +25,7 @@ from apscheduler.events import (
 )
 
 from core.pkg.scheduler.async_to_sync_db_url import async_to_sync_db_url
-from core.pkg.scheduler.config import SchedulerConfig
+from core.pkg.scheduler.config import SchedulerConfig, RedisStoreArgs, DbStoreArgs
 
 logger = logging.getLogger(__name__)
 
@@ -84,12 +85,12 @@ class SchedulerManager:
             job_defaults.update(self.config.job_defaults)
 
             # 创建调度器 BackgroundScheduler，BlockingScheduler，AsyncIOScheduler
-            if self.config.jobstore_type == "AsyncIOScheduler":
+            if self.config.scheduler_type == "AsyncIOScheduler":
                 scheduler = AsyncIOScheduler(jobstores=jobstores,
                     executors=executors,
                     job_defaults=job_defaults,
                     timezone=self.config.timezone)
-            elif self.config.jobstore_type == "BlockingScheduler":
+            elif self.config.scheduler_type == "BlockingScheduler":
                 scheduler = BlockingScheduler(
                     jobstores=jobstores,
                     executors=executors,
@@ -143,7 +144,18 @@ class SchedulerManager:
         """创建作业存储"""
         if self.config.jobstore_type == 'memory':
             return MemoryJobStore()
+        elif self.config.jobstore_type == 'redis':
+            redisArgs = self.config.args or RedisStoreArgs()
+            return RedisJobStore(
+                            db=int(redisArgs.db),
+                            jobs_key=redisArgs.jobs_key,
+                            run_times_key=redisArgs.run_times_key,
+                            host= redisArgs.host,  # 集群中的某个节点IP
+                            port=int(redisArgs.port),
+                            password=redisArgs.password,
+                  )
 
+        dbArgs = self.config.args or DbStoreArgs()
         common_options = {
             'engine_options': {
                 'pool_pre_ping': True,
@@ -151,7 +163,7 @@ class SchedulerManager:
                 'connect_args': {'connect_timeout': 5}
             }
         }
-        url = async_to_sync_db_url(self.config.database_url)
+        url = async_to_sync_db_url(dbArgs.database_url)
         if self.config.jobstore_type == 'sqlite':
             return SQLAlchemyJobStore(
                 url=url,
