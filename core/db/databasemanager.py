@@ -10,9 +10,7 @@ from core.config.fullconfig import DatabaseConfig
 from core.db.db_type import mysql, postgresql, sqlite
 
 # 配置日志
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 class DatabaseManager:
     _engines = {}

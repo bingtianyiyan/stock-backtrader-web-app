@@ -1,0 +1,104 @@
+app:
+  debug: true
+  env: dev
+db_configs:
+  - db_type: "mysql"
+    db_action: "mainConn"
+    host: "127.0.0.1"
+    port: 3306
+    username: "root"
+    password: "root"
+    database: "tiny_zvt_stock"
+    extra:
+      echo: true
+      pool_size: 20
+      charset: "utf8mb4"
+      max_overflow: 20
+      pool_recycle: 1800
+    mysql_config:
+      ssl_mode: "disabled"
+
+#  - db_type: "postgresql"
+#    db_action: "mainConn"
+#    host: "127.0.0.1"
+#    port: 12390
+#    username: "root"
+#    password: "root123"
+#    database: "tiny_zvt_stock"
+#    extra:
+#      echo: true
+#      pool_size: 20
+#      charset: "utf8mb4"
+#      max_overflow: 20
+#      pool_recycle: 1800
+#    mysql_config:
+#      ssl_mode: "disabled"
+#    pg_config:
+#      schema: "public"
+#     # sslmode: "require"
+
+#  - db_type: "postgresql"
+#    db_action: "analytics"
+#    host: "127.0.0.1"
+#    port: 5432
+#    username: "postgres"
+#    password: "postgres"
+#    database: "analytics_db"
+#    extra:
+#      pool_size: 10
+#    pg_config:
+#      schema: "analytics"
+#      sslmode: "require"
+
+scheduler_config:
+   jobstore_type: 'mysql'
+   database_url: 'mysql+pymysql://root:root@localhost/tinyjobs'
+   max_workers: 10
+
+logger:
+  driver: loguru
+  level: debug
+  write_to:
+    - name: console
+#      args:
+#         format: '"<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+#            "<level>{level: <8}</level> | "
+#            "<cyan>{thread.name}</cyan> | "
+#            "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | "
+#            "<cyan>{function}</cyan> |"
+#            "<level>{message}</level> |"
+#            "<yellow>{extra}</yellow>"'
+    - name: file
+      args:
+        path: "logs/app_{time:YYYY-MM-DD}.log"
+        retention: "30 days"
+
+sqlinfo:
+  initTable: false
+jqdata:
+  jq_username: ""
+  jq_password: ""
+
+proxy:
+  http_proxy: "127.0.0.1:1087"
+  https_proxy: "127.0.0.1:1087"
+
+email:
+  smtp_host: "smtpdm.aliyun.com"
+  smtp_port: 80
+  email_username: ""
+  email_password: ""
+
+wechat:
+  wechat_app_id: ""
+  wechat_app_secrect: ""
+  qiye_wechat_bot_token: ""
+
+qmt:
+  qmt_mini_data_path: "E:\\qmt\\userdata_mini"
+  qmt_account_id: ""
+
+ai:
+  moonshot_api_key: ""
+  qwen_api_key: ""
+

@@ -220,6 +220,7 @@ def register_schema(
                                     logger.error(e)
                 except Exception as e:
                     logger.error(e)
+        break        #只处理一次
 
 
 # the __all__ is generated

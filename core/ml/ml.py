@@ -7,7 +7,7 @@ from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from core.api import default_adjust_type, get_kdata
+from core.api.kdata import default_adjust_type, get_kdata
 from core.contract import IntervalLevel, AdjustType
 from core.contract import TradableEntity
 from core.contract.drawer import Drawer
